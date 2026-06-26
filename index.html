@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đếm Ngược</title>
+  <!-- Nhúng font chữ Quicksand cho giao diện dễ thương -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* Nền gradient pastel hiện đại */
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      font-family: 'Quicksand', sans-serif;
+      overflow: hidden;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+      padding: 40px 60px;
+      border-radius: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+    }
+
+    /* Hiệu ứng trôi nổi cho quả trứng */
+    .egg-wrapper {
+      animation: float 3s ease-in-out infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .countdown-text {
+      font-size: 2.5rem;
+      color: #ff6b6b;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(255, 107, 107, 0.2);
+      margin: 0;
+      letter-spacing: 1px;
+    }
+
+    /* Hiệu ứng bóng cho quả trứng */
+    .shadow {
+      width: 80px;
+      height: 15px;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      margin: 0 auto;
+      animation: shadowScale 3s ease-in-out infinite;
+    }
+
+    @keyframes shadowScale {
+      0% { transform: scale(1); opacity: 0.4; }
+      50% { transform: scale(0.8); opacity: 0.2; }
+      100% { transform: scale(1); opacity: 0.4; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="egg-wrapper">
+      <!-- Trứng SVG tự vẽ siêu dễ thương -->
+      <svg viewBox="0 0 100 120" width="160" height="190">
+        <!-- Thân quả trứng -->
+        <path d="M50 0 C20 0 0 50 0 80 C0 110 20 120 50 120 C80 120 100 110 100 80 C100 50 80 0 50 0 Z" 
+              fill="#FFF8E7" stroke="#FFE0B2" stroke-width="3"/>
+        
+        <!-- Khuôn mặt -->
+        <!-- Mắt -->
+        <circle cx="35" cy="65" r="4.5" fill="#5D4037" />
+        <circle cx="65" cy="65" r="4.5" fill="#5D4037" />
+        <!-- Miệng cười -->
+        <path d="M43 75 Q50 82 57 75" stroke="#5D4037" stroke-width="3" fill="transparent" stroke-linecap="round"/>
+        <!-- Má hồng -->
+        <circle cx="23" cy="72" r="6" fill="#FF8A80" opacity="0.7"/>
+        <circle cx="77" cy="72" r="6" fill="#FF8A80" opacity="0.7"/>
+      </svg>
+    </div>
+    <div class="shadow"></div>
+    <p class="countdown-text" id="countdown">Đang tải...</p>
+  </div>
+
+  <script>
+    // --- THIẾT LẬP NGÀY MỤC TIÊU ---
+    // Định dạng: YYYY-MM-DDTHH:mm:ss+07:00 (Múi giờ Việt Nam)
+    // Bạn có thể sửa ngày 2026-08-09 thành ngày bạn muốn.
+    const targetDate = new Date('2026-08-10T00:00:00+07:00');
+
+    function updateCountdown() {
+      // Lấy thời gian hiện tại
+      const now = new Date();
+      
+      // Ép kiểu ép tính toán trên múi giờ Việt Nam (Asia/Ho_Chi_Minh)
+      const vnTimeStr = now.toLocaleString("en-US", {timeZone: "Asia/Ho_Chi_Minh"});
+      const vnTime = new Date(vnTimeStr);
+      
+      const targetVnTimeStr = targetDate.toLocaleString("en-US", {timeZone: "Asia/Ho_Chi_Minh"});
+      const targetVnTime = new Date(targetVnTimeStr);
+
+      // Tính khoảng cách (tính bằng milliseconds)
+      const diffTime = targetVnTime - vnTime;
+      
+      // Quy đổi ra số ngày (làm tròn lên)
+      let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      // Không cho hiển thị số âm nếu đã qua ngày
+      if (days < 0) days = 0;
+
+      // Cập nhật giao diện
+      document.getElementById('countdown').innerText = `Còn ${days} ngày`;
+    }
+
+    // Chạy ngay lần đầu
+    updateCountdown();
+
+    // Cập nhật lại mỗi 1 tiếng đồng hồ (để tự động qua ngày mới nếu người dùng treo tab)
+    setInterval(updateCountdown, 1000 * 60 * 60);
+  </script>
+
+</body>
+</html>
