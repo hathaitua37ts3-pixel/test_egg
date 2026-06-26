@@ -3,9 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đếm Ngược</title>
+  <title>Đếm Ngược & Nguyện Ước Thất Tịch</title>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary-color: #ff6b6b;
+      --secondary-color: #f7d794; /* Màu pastel vàng cho sự kiện */
+      --text-color: #5D4037;
+      --bg-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      --glass-bg: rgba(255, 255, 255, 0.6);
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -13,26 +21,33 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      /* Nền gradient pastel hiện đại */
-      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      background: var(--bg-gradient);
       font-family: 'Quicksand', sans-serif;
       overflow: hidden;
+      color: var(--text-color);
     }
 
+    /* Khung chứa chính (Glassmorphism) */
     .container {
-      background: rgba(255, 255, 255, 0.6);
+      background: var(--glass-bg);
       backdrop-filter: blur(10px);
-      padding: 40px 60px;
+      padding: 40px 50px;
       border-radius: 30px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
       text-align: center;
       border: 2px solid rgba(255, 255, 255, 0.8);
+      position: relative;
+      transition: transform 0.3s ease;
     }
 
-    /* Hiệu ứng trôi nổi cho quả trứng */
+    .container:hover {
+      transform: translateY(-5px);
+    }
+
+    /* --- PHẦN TRỨNG ĐẾM NGƯỢC (Giữ nguyên giao diện cũ) --- */
     .egg-wrapper {
       animation: float 3s ease-in-out infinite;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     @keyframes float {
@@ -42,21 +57,20 @@
     }
 
     .countdown-text {
-      font-size: 2.5rem;
-      color: #ff6b6b;
+      font-size: 2.2rem;
+      color: var(--primary-color);
       font-weight: 700;
       text-shadow: 2px 2px 4px rgba(255, 107, 107, 0.2);
       margin: 0;
       letter-spacing: 1px;
     }
 
-    /* Hiệu ứng bóng cho quả trứng */
     .shadow {
       width: 80px;
-      height: 15px;
-      background: rgba(0, 0, 0, 0.1);
+      height: 12px;
+      background: rgba(0, 0, 0, 0.08);
       border-radius: 50%;
-      margin: 0 auto;
+      margin: 0 auto 25px auto;
       animation: shadowScale 3s ease-in-out infinite;
     }
 
@@ -65,16 +79,179 @@
       50% { transform: scale(0.8); opacity: 0.2; }
       100% { transform: scale(1); opacity: 0.4; }
     }
+
+    /* --- PHẦN NÚT SỰ KIỆN THẤT TỊCH --- */
+    .event-section {
+      margin-top: 20px;
+      border-top: 2px dashed rgba(255, 107, 107, 0.3);
+      padding-top: 20px;
+    }
+
+    #btn-thattich {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 auto;
+    }
+
+    #btn-thattich:hover {
+      background-color: #ff4f4f;
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+    }
+
+    #btn-thattich svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+
+    /* --- OVERLAY & TỜ GIẤY NGUYỆN ƯỚC (Modal) --- */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      display: none; /* Ẩn mặc định */
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .wish-paper {
+      background: #fff8e7; /* Màu giấy cuộn cổ trang pastel */
+      width: 350px;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      position: relative;
+      border: 5px solid #f7d794; /* Viền giấy */
+      transform: scale(0.7);
+      transition: transform 0.3s ease;
+      text-align: left;
+    }
+
+    .overlay.active .wish-paper {
+      transform: scale(1);
+    }
+
+    /* Chi tiết ruy băng trang trí giấy nguyện ước */
+    .wish-paper::before, .wish-paper::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 40px;
+      background: #ff6b6b;
+      border-radius: 5px;
+      top: -15px;
+    }
+    .wish-paper::before { left: 50px; }
+    .wish-paper::after { right: 50px; }
+
+    .close-paper {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #8d6e63;
+      font-weight: 700;
+    }
+
+    .paper-title {
+      font-size: 1.5rem;
+      color: #8d6e63;
+      font-weight: 700;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #f7d794;
+      padding-bottom: 10px;
+    }
+
+    .wish-label {
+      font-weight: 700;
+      margin-bottom: 5px;
+      display: block;
+      color: #8d6e63;
+    }
+
+    #wish-content {
+      width: 100%;
+      height: 120px;
+      border-radius: 10px;
+      border: 2px solid #f7d794;
+      background-color: rgba(255, 255, 255, 0.5);
+      padding: 10px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 1rem;
+      resize: none;
+      box-sizing: border-box; /* Quan trọng để padding không làm lệch width */
+      color: var(--text-color);
+    }
+
+    #wish-content:focus {
+      outline: none;
+      border-color: #ff6b6b;
+      background-color: white;
+    }
+
+    #btn-send-wish {
+      background-color: #f7d794;
+      color: #8d6e63;
+      border: none;
+      padding: 10px 20px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 15px;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    #btn-send-wish:hover {
+      background-color: #f3ce7a;
+      transform: translateY(-2px);
+    }
+
+    #btn-send-wish:disabled {
+      background-color: #e0e0e0;
+      color: #9e9e9e;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
     <div class="egg-wrapper">
-      <svg viewBox="0 0 100 120" width="160" height="190">
+      <svg viewBox="0 0 100 120" width="140" height="170">
         <path d="M50 0 C20 0 0 50 0 80 C0 110 20 120 50 120 C80 120 100 110 100 80 C100 50 80 0 50 0 Z" 
               fill="#FFF8E7" stroke="#FFE0B2" stroke-width="3"/>
-        
         <circle cx="35" cy="65" r="4.5" fill="#5D4037" />
         <circle cx="65" cy="65" r="4.5" fill="#5D4037" />
         <path d="M43 75 Q50 82 57 75" stroke="#5D4037" stroke-width="3" fill="transparent" stroke-linecap="round"/>
@@ -84,6 +261,23 @@
     </div>
     <div class="shadow"></div>
     <p class="countdown-text" id="countdown">Đang tải...</p>
+
+    <div class="event-section">
+      <button id="btn-thattich">
+        <svg viewBox="0 0 512 512"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0s208 93.1 208 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
+        Nguyện Ước Thất Tịch
+      </button>
+    </div>
+  </div>
+
+  <div class="overlay" id="wish-overlay">
+    <div class="wish-paper">
+      <span class="close-paper" id="close-wish">&times;</span>
+      <h3 class="paper-title">Hỷ Thước Se Duyên</h3>
+      <label class="wish-label" for="wish-content">Lời nguyện ước của bạn:</label>
+      <textarea id="wish-content" placeholder="Viết những mong muốn của bạn vào đây..."></textarea>
+      <button id="btn-send-wish">Gửi Nguyện Ước</button>
+    </div>
   </div>
 
   <script src="script.js"></script>
