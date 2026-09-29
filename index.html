@@ -2,285 +2,1315 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đếm Ngược & Nguyện Ước Thất Tịch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Nông Trại Của Tú & Yêu ❤️</title>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary-color: #ff6b6b;
-      --secondary-color: #f7d794; /* Màu pastel vàng cho sự kiện */
-      --text-color: #5D4037;
-      --bg-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-      --glass-bg: rgba(255, 255, 255, 0.6);
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; padding: 0; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); font-family: 'Quicksand', sans-serif; }
+    .container { width: 100%; max-width: 420px; height: 100%; max-height: 100vh; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); padding: 15px; border-radius: 0; display: flex; flex-direction: column; justify-content: space-between; position: relative;}
+    @media (min-width: 450px) { .container { height: 95vh; border-radius: 30px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); border: 2px solid rgba(255, 255, 255, 0.8); margin: 10px; } }
+    
+    /* GIAO DIỆN THANH TRẠNG THÁI */
+    .top-area { position: relative; z-index: 100; }
+    .stats-bar { display: flex; flex-direction: column; gap: 8px; background: rgba(255, 255, 255, 0.9); padding: 10px 15px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); font-size: 0.95rem; color: #5D4037; }
+    .happiness-row { display: flex; justify-content: center; align-items: center; border-bottom: 1px dashed #D7CCC8; padding-bottom: 6px; font-size: 1.1rem;}
+    .resource-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; padding-top: 4px;}
+    
+    .stat-item { display: flex; align-items: center; gap: 4px; cursor: default; user-select: none; }
+    .exp-text { font-size: 0.8rem; color: #8D6E63; margin-left: 2px; }
+    
+    /* HỆ THỐNG MENU & THANH NĂNG LƯỢNG */
+    .menu-container { position: absolute; top: calc(100% + 12px); left: 0; display: flex; gap: 10px; align-items: center; }
+    .hamburger-wrapper { position: relative; }
+    .hamburger-btn { width: 44px; height: 44px; background: #FFF8E7; border: 2px solid #FFE0B2; border-radius: 14px; font-size: 1.5rem; color: #5D4037; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: all 0.2s; user-select: none; }
+    .hamburger-btn:active { transform: scale(0.9); }
+    .energy-ring { width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; position: relative; user-select: none; }
+    
+    .dropdown-menu { position: absolute; top: 55px; left: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border: 2px solid #FFE0B2; border-radius: 16px; padding: 12px; box-shadow: 0 12px 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 8px; width: 170px; opacity: 0; visibility: hidden; transform: translateY(-10px) scale(0.95); transform-origin: top left; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .dropdown-menu.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+    
+    /* HIỆU ỨNG TRỨNG & BÓNG */
+    .scene-wrapper { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+    .scene { position: relative; width: 180px; height: 210px; }
+    
+    /* BONG BÓNG CHAT */
+    .speech-bubble { position: absolute; top: -15px; left: 85%; transform: translateX(-50%); background: #fff; border: 2px solid #ff9a9e; border-radius: 8px; padding: 4px 6px; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3); cursor: pointer; z-index: 10; animation: floatBubble 2s infinite ease-in-out; display: none; }
+    .speech-bubble::after { content: ''; position: absolute; bottom: -8px; left: 10px; border-width: 8px 8px 0; border-style: solid; border-color: #ff9a9e transparent transparent transparent; }
+    .speech-bubble::before { content: ''; position: absolute; bottom: -5px; left: 12px; border-width: 6px 6px 0; border-style: solid; border-color: #fff transparent transparent transparent; z-index: 1; }
+    @keyframes floatBubble { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-6px); } }
+    
+    .speech-bubble.style-1 { border-radius: 8px; border-color: #ff9a9e; background: #fff; }
+    .speech-bubble.style-1::after { border-color: #ff9a9e transparent transparent transparent; }
+    .speech-bubble.style-1::before { border-color: #fff transparent transparent transparent; }
+
+    .speech-bubble.style-2 { border-radius: 16px 16px 16px 4px; border-color: #ff4d4d; background: #ffe6e6; }
+    .speech-bubble.style-2::after { border-color: #ff4d4d transparent transparent transparent; }
+    .speech-bubble.style-2::before { border-color: #ffe6e6 transparent transparent transparent; }
+
+    .speech-bubble.style-3 { border-radius: 50%; border-color: #ffa502; background: #fffacd; padding: 6px 8px; }
+    .speech-bubble.style-3::after { border-color: #ffa502 transparent transparent transparent; }
+    .speech-bubble.style-3::before { border-color: #fffacd transparent transparent transparent; }
+
+    .speech-bubble.style-4 { border-radius: 12px 24px 12px 24px; border-color: #70a1ff; background: #f1f2f6; }
+    .speech-bubble.style-4::after { border-color: #70a1ff transparent transparent transparent; }
+    .speech-bubble.style-4::before { border-color: #f1f2f6 transparent transparent transparent; }
+
+    .egg-float { position: absolute; top: 0; left: 50%; transform: translateX(-50%); animation: float 3s ease-in-out infinite; z-index: 2; }
+    @keyframes float { 0%, 100% { transform: translateX(-50%) translateY(0px); } 50% { transform: translateX(-50%) translateY(-15px); } }
+    
+    /* Cập nhật Egg-Interactive với transition mượt hơn */
+    .egg-interactive { cursor: pointer; transform-origin: bottom center; transition: filter 0.2s, transform 0.2s ease-out; }
+    .egg-interactive:hover { filter: brightness(1.05); }
+    
+    .shadow { position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); width: 80px; height: 12px; background: rgba(0, 0, 0, 0.12); border-radius: 50%; animation: shadowScale 3s ease-in-out infinite; z-index: 1; }
+    @keyframes shadowScale { 0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.5; } 50% { transform: translateX(-50%) scale(0.7); opacity: 0.2; } }
+    .countdown-text { font-size: 1.6rem; color: #ff6b6b; font-weight: 700; text-shadow: 1px 1px 3px rgba(255, 107, 107, 0.2); margin: 10px 0 0; text-align: center; }
+    
+    /* KHU VỰC ĐIỀU KHIỂN BÊN DƯỚI */
+    .control-section { background: rgba(255, 255, 255, 0.85); border-radius: 24px; padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+    
+    .action-bar { display: flex; flex-direction: column; gap: 10px; }
+    .btn { border: none; padding: 12px 5px; border-radius: 14px; font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); user-select: none; width: 100%; }
+    .btn:active { transform: translateY(2px); box-shadow: none; }
+    
+    .btn-farm { background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%); color: #fff; }
+    .btn-seed { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); color: #1A237E; }
+    .btn-inventory { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #5D4037; }
+    .btn-market { background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%); color: #33691E; }
+    .sync-status { text-align: center; font-size: 0.75rem; color: #4CAF50; margin-top: 10px; min-height: 15px; font-weight: 700; transition: opacity 0.3s; }
+    
+    /* KHAY CHO ĂN VUỐT NGANG */
+    .feed-slider-container { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding: 5px; background: rgba(255, 255, 255, 0.5); border-radius: 14px; border: 2px dashed #ffecd2; -ms-overflow-style: none; scrollbar-width: none; }
+    .feed-slider-container::-webkit-scrollbar { display: none; }
+    .feed-item { flex: 0 0 auto; width: 60px; height: 65px; background: #FFF8E7; border: 2px solid #FFE0B2; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: transform 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); user-select: none; }
+    .feed-item:active { transform: scale(0.9); }
+    .feed-item .f-icon { font-size: 1.6rem; }
+    .feed-item .f-count { position: absolute; bottom: -5px; right: -5px; background: #ff6b6b; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 1px 4px; border-radius: 6px; border: 1px solid #fff; }
+    .feed-empty-msg { width: 100%; text-align: center; font-size: 0.85rem; color: #8D6E63; padding: 5px; font-weight: 700; }
+
+    /* KHU VỰC MINI FARM */
+    .mini-farm-wrapper { background: rgba(255, 255, 255, 0.9); border: 2px solid #81c784; border-radius: 16px; padding: 8px; display: flex; align-items: center; position: relative; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .mini-farm-nav { display: flex; flex-direction: column; gap: 6px; order: 2; background: #F1F8E9; border: 2px solid #C5E1A5; border-radius: 12px; padding: 4px; }
+    .mini-farm-nav-btn { background: #fff; border: 1px solid #A5D6A7; color: #2E7D32; width: 28px; height: 28px; display: flex; justify-content: center; align-items: center; border-radius: 8px; cursor: pointer; font-size: 0.8rem; user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .mini-farm-nav-btn:active { transform: scale(0.9); }
+    .mini-farm-plots { display: flex; gap: 8px; flex-grow: 1; justify-content: space-between; order: 1; }
+
+    /* DANH SÁCH ANIMATION */
+    .anim-bounce { animation: bounce 0.6s cubic-bezier(0.28, 0.84, 0.42, 1); }
+    .anim-wiggle { animation: wiggle 0.6s ease-in-out; }
+    .anim-squish { animation: squish 0.6s ease-in-out; }
+    .anim-shake { animation: shakeHead 0.5s ease-in-out; }
+    .anim-sad { animation: sadFloat 3s infinite ease-in-out; }
+    
+    /* 5 Animation mới */
+    .anim-spin { animation: spin 0.6s ease-in-out; }
+    .anim-jump { animation: jump 0.6s cubic-bezier(0.28, 0.84, 0.42, 1); }
+    .anim-wobble { animation: wobble 0.6s ease-in-out; }
+    .anim-heartbeat { animation: heartbeat 0.6s ease-in-out; }
+    .anim-rubberband { animation: rubberband 0.6s ease-in-out; }
+
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
+    @keyframes wiggle { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
+    @keyframes squish { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.15, 0.85) translateY(12px); } }
+    
+    @keyframes sadFloat { 
+        0%, 100% { transform: scale(1, 0.95) translateY(5px); } 
+        50% { transform: scale(1.02, 0.98) translateY(10px); } 
+    }
+    @keyframes shakeHead {
+        0%, 100% { transform: rotate(0deg); }
+        20% { transform: rotate(-15deg); }
+        40% { transform: rotate(15deg); }
+        60% { transform: rotate(-10deg); }
+        80% { transform: rotate(10deg); }
+    }
+    
+    /* Keyframes mới */
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes jump { 
+        0%, 100% { transform: translateY(0) scale(1, 1); } 
+        50% { transform: translateY(-40px) scale(0.9, 1.1); } 
+    }
+    @keyframes wobble { 
+        0%, 100% { transform: translateX(0) rotate(0deg); } 
+        15% { transform: translateX(-15px) rotate(-15deg); } 
+        30% { transform: translateX(10px) rotate(10deg); } 
+        45% { transform: translateX(-10px) rotate(-10deg); } 
+        60% { transform: translateX(5px) rotate(5deg); } 
+    }
+    @keyframes heartbeat { 
+        0%, 100% { transform: scale(1); } 
+        15% { transform: scale(1.15); } 
+        30% { transform: scale(1); } 
+        45% { transform: scale(1.15); } 
+    }
+    @keyframes rubberband {
+        0%, 100% { transform: scale(1, 1); }
+        30% { transform: scale(1.25, 0.75); }
+        40% { transform: scale(0.75, 1.25); }
+        50% { transform: scale(1.15, 0.85); }
+        65% { transform: scale(0.95, 1.05); }
+        75% { transform: scale(1.05, 0.95); }
     }
 
-    body {
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: var(--bg-gradient);
-      font-family: 'Quicksand', sans-serif;
-      overflow: hidden;
-      color: var(--text-color);
-    }
+    /* HỆ THỐNG CUSTOM MODAL */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-box { background: #fff; padding: 20px; border-radius: 28px; width: 90%; max-width: 360px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.15); transform: translateY(30px) scale(0.9); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 85vh; overflow-y: auto;}
+    .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
+    .modal-title { color: #ff6b6b; font-size: 1.2rem; margin: 0 0 12px; }
+    .modal-desc { color: #5D4037; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5; }
+    .modal-input { width: 100%; padding: 12px; border: 2px solid #ffecd2; border-radius: 14px; font-family: 'Quicksand'; font-size: 1rem; text-align: center; font-weight: 700; color: #5D4037; outline: none; margin-bottom: 18px; display: none; transition: border 0.3s; }
+    .modal-input:focus { border-color: #ff9a9e; }
+    .modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: auto;}
+    .modal-btn { flex: 1; border: none; padding: 12px; border-radius: 14px; font-family: 'Quicksand'; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: transform 0.2s; display: block; }
+    .modal-btn:active { transform: scale(0.95); }
+    .modal-btn:disabled { background: #EFEBE9 !important; color: #BCAAA4 !important; cursor: not-allowed; transform: none; }
+    .btn-ok { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #5D4037; }
+    .btn-cancel { background: #EFEBE9; color: #8D6E63; display: none; }
+    
+    /* GIAO DIỆN VƯỜN ƯƠM */
+    .farm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+    .plot { background: #EFEBE9; border: 2px dashed #D7CCC8; border-radius: 16px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: all 0.2s; user-select: none; }
+    .plot:active { transform: scale(0.95); }
+    .plot.planted { background: #E8F5E9; border-style: solid; border-color: #A5D6A7; }
+    .plot.ready { background: #FFF9C4; border-color: #FFF59D; animation: pulse 1.5s infinite; }
+    .plot.locked { background: #CFD8DC; border: 2px solid #B0BEC5; opacity: 0.7; }
+    .mini-farm-plots .plot { height: 75px; flex: 1; }
+    .mini-farm-plots .plot-icon { font-size: 1.5rem; }
+    .plot.thirsty { background: #FFE0B2; border-style: solid; border-color: #FFB74D; }
+    
+    .plot-action-menu { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 6px; background: rgba(255, 255, 255, 0.95); padding: 6px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10; }
+    .action-icon-btn { width: 34px; height: 34px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; cursor: pointer; border: 2px solid; position: relative; }
+    .action-icon-btn.water { background: #E3F2FD; border-color: #90CAF9; }
+    .action-icon-btn.fertilize { background: #FFF3E0; border-color: #FFCC80; }
+    .action-item-count { position: absolute; bottom: -5px; right: -5px; background: #ff6b6b; color: white; font-size: 0.65rem; font-weight: 700; padding: 1px 4px; border-radius: 6px; border: 1px solid #fff; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+    .plot-icon { font-size: 1.8rem; margin-bottom: 2px; }
+    .plot-timer { font-size: 0.75rem; color: #5D4037; font-weight: 700; text-align: center; }
 
-    /* Khung chứa chính (Glassmorphism) */
-    .container {
-      background: var(--glass-bg);
-      backdrop-filter: blur(10px);
-      padding: 40px 50px;
-      border-radius: 30px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      border: 2px solid rgba(255, 255, 255, 0.8);
-      position: relative;
-      transition: transform 0.3s ease;
-    }
+    /* THƯ VÀ QUÀ TẶNG */
+    .mail-content-box { background: #FFF8E7; border: 2px solid #FFE0B2; border-radius: 16px; padding: 15px; margin-bottom: 15px; min-height: 100px; white-space: pre-wrap; font-size: 0.95rem; }
+    .mail-attachment { display: flex; flex-direction: column; background: #E8F5E9; border: 2px solid #A5D6A7; padding: 10px 15px; border-radius: 14px; margin-bottom: 15px; gap: 10px; text-align: left;}
+    
+    #mail-attach-list { display: flex; flex-wrap: wrap; gap: 6px; font-size: 0.95rem;}
+    
+    .cheat-compose-section { background: #FFF3E0; border: 2px dashed #FFB74D; border-radius: 14px; padding: 10px; text-align: left; margin-bottom: 15px; }
+    .cheat-input-group { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #5D4037; }
+    .cheat-input-group select, .cheat-input-group input { padding: 4px; border-radius: 6px; border: 1px solid #FFB74D; font-family: 'Quicksand'; outline: none; }
+    
+    .history-box { background: #F5F5F5; border: 1px solid #E0E0E0; border-radius: 10px; padding: 8px; margin-bottom: 8px; font-size: 0.85rem; text-align: left;}
 
-    .container:hover {
-      transform: translateY(-5px);
-    }
+    /* BẢNG CHEAT DẠNG TABLE */
+    .cheat-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.9rem;}
+    .cheat-table td { padding: 8px 4px; border-bottom: 1px dashed #ffecd2; color: #5D4037; font-weight: 700; text-align: left; vertical-align: middle;}
+    .cheat-table td:last-child { text-align: right; }
+    .cheat-table input[type="number"] { width: 70px; text-align: center; border: 2px solid #ffecd2; border-radius: 8px; padding: 6px; outline: none; font-family: 'Quicksand'; font-weight: 700; color: #5D4037;}
+    .cheat-table input[type="radio"] { margin-right: 4px; cursor: pointer; }
 
-    /* --- PHẦN TRỨNG ĐẾM NGƯỢC (Giữ nguyên giao diện cũ) --- */
-    .egg-wrapper {
-      animation: float 3s ease-in-out infinite;
-      margin-bottom: 10px;
-    }
+    .cheat-fruit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .cheat-fruit-item { display: flex; align-items: center; justify-content: space-between; background: #FFF8E7; padding: 6px 8px; border-radius: 10px; border: 1px solid #FFE0B2; font-size: 1.2rem;}
+    .cheat-fruit-item input { width: 40px; text-align: center; border: 1px solid #ffecd2; border-radius: 6px; padding: 4px; outline: none; font-family: 'Quicksand'; font-weight: 700; font-size: 0.9rem; color: #5D4037;}
+    
+    .cheat-plot-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
-      100% { transform: translateY(0px); }
-    }
-
-    .countdown-text {
-      font-size: 2.2rem;
-      color: var(--primary-color);
-      font-weight: 700;
-      text-shadow: 2px 2px 4px rgba(255, 107, 107, 0.2);
-      margin: 0;
-      letter-spacing: 1px;
-    }
-
-    .shadow {
-      width: 80px;
-      height: 12px;
-      background: rgba(0, 0, 0, 0.08);
-      border-radius: 50%;
-      margin: 0 auto 25px auto;
-      animation: shadowScale 3s ease-in-out infinite;
-    }
-
-    @keyframes shadowScale {
-      0% { transform: scale(1); opacity: 0.4; }
-      50% { transform: scale(0.8); opacity: 0.2; }
-      100% { transform: scale(1); opacity: 0.4; }
-    }
-
-    /* --- PHẦN NÚT SỰ KIỆN THẤT TỊCH --- */
-    .event-section {
-      margin-top: 20px;
-      border-top: 2px dashed rgba(255, 107, 107, 0.3);
-      padding-top: 20px;
-    }
-
-    #btn-thattich {
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 12px 25px;
-      font-family: 'Quicksand', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      border-radius: 50px;
-      cursor: pointer;
-      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin: 0 auto;
-    }
-
-    #btn-thattich:hover {
-      background-color: #ff4f4f;
-      transform: scale(1.05);
-      box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
-    }
-
-    #btn-thattich svg {
-      width: 20px;
-      height: 20px;
-      fill: white;
-    }
-
-    /* --- OVERLAY & TỜ GIẤY NGUYỆN ƯỚC (Modal) --- */
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(5px);
-      display: none; /* Ẩn mặc định */
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .overlay.active {
-      display: flex;
-      opacity: 1;
-    }
-
-    .wish-paper {
-      background: #fff8e7; /* Màu giấy cuộn cổ trang pastel */
-      width: 350px;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-      position: relative;
-      border: 5px solid #f7d794; /* Viền giấy */
-      transform: scale(0.7);
-      transition: transform 0.3s ease;
-      text-align: left;
-    }
-
-    .overlay.active .wish-paper {
-      transform: scale(1);
-    }
-
-    /* Chi tiết ruy băng trang trí giấy nguyện ước */
-    .wish-paper::before, .wish-paper::after {
-      content: '';
-      position: absolute;
-      width: 20px;
-      height: 40px;
-      background: #ff6b6b;
-      border-radius: 5px;
-      top: -15px;
-    }
-    .wish-paper::before { left: 50px; }
-    .wish-paper::after { right: 50px; }
-
-    .close-paper {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #8d6e63;
-      font-weight: 700;
-    }
-
-    .paper-title {
-      font-size: 1.5rem;
-      color: #8d6e63;
-      font-weight: 700;
-      text-align: center;
-      margin-top: 0;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #f7d794;
-      padding-bottom: 10px;
-    }
-
-    .wish-label {
-      font-weight: 700;
-      margin-bottom: 5px;
-      display: block;
-      color: #8d6e63;
-    }
-
-    #wish-content {
-      width: 100%;
-      height: 120px;
-      border-radius: 10px;
-      border: 2px solid #f7d794;
-      background-color: rgba(255, 255, 255, 0.5);
-      padding: 10px;
-      font-family: 'Quicksand', sans-serif;
-      font-size: 1rem;
-      resize: none;
-      box-sizing: border-box; /* Quan trọng để padding không làm lệch width */
-      color: var(--text-color);
-    }
-
-    #wish-content:focus {
-      outline: none;
-      border-color: #ff6b6b;
-      background-color: white;
-    }
-
-    #btn-send-wish {
-      background-color: #f7d794;
-      color: #8d6e63;
-      border: none;
-      padding: 10px 20px;
-      font-family: 'Quicksand', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      border-radius: 50px;
-      cursor: pointer;
-      margin-top: 15px;
-      width: 100%;
-      transition: all 0.3s ease;
-    }
-
-    #btn-send-wish:hover {
-      background-color: #f3ce7a;
-      transform: translateY(-2px);
-    }
-
-    #btn-send-wish:disabled {
-      background-color: #e0e0e0;
-      color: #9e9e9e;
-      cursor: not-allowed;
-    }
+    .inventory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; max-height: 220px; overflow-y: auto; padding-right: 5px; }
+    .inv-item { background: #FFF8E7; border: 2px solid #FFE0B2; border-radius: 14px; padding: 12px 5px; font-size: 1.8rem; position: relative; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .inv-count { position: absolute; bottom: -5px; right: -5px; font-size: 0.75rem; font-weight: 700; color: #fff; background: #ff6b6b; padding: 2px 6px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 2px solid #fff; }
+    .inv-empty { grid-column: span 4; font-size: 0.95rem; color: #8D6E63; padding: 20px 0; }
+    
+    .market-content { overflow-y: auto; padding-right: 5px; margin-bottom: 15px; }
+    .market-section-title { text-align: left; font-size: 1.05rem; color: #E65100; font-weight: 700; margin: 10px 0; border-bottom: 2px dashed #FFE0B2; padding-bottom: 5px; }
+    .market-grid { display: flex; flex-direction: column; gap: 10px; }
+    .market-item { display: flex; align-items: center; justify-content: space-between; background: #F1F8E9; padding: 10px; border-radius: 14px; border: 2px solid #C5E1A5; }
+    .market-item.buy-item { background: #E3F2FD; border-color: #90CAF9; }
+    .m-icon { font-size: 1.8rem; }
+    .m-details { flex-grow: 1; text-align: left; padding: 0 10px; }
+    .m-price { font-weight: 700; color: #33691E; font-size: 0.95rem; }
   </style>
 </head>
 <body>
-
   <div class="container">
-    <div class="egg-wrapper">
-      <svg viewBox="0 0 100 120" width="140" height="170">
-        <path d="M50 0 C20 0 0 50 0 80 C0 110 20 120 50 120 C80 120 100 110 100 80 C100 50 80 0 50 0 Z" 
-              fill="#FFF8E7" stroke="#FFE0B2" stroke-width="3"/>
-        <circle cx="35" cy="65" r="4.5" fill="#5D4037" />
-        <circle cx="65" cy="65" r="4.5" fill="#5D4037" />
-        <path d="M43 75 Q50 82 57 75" stroke="#5D4037" stroke-width="3" fill="transparent" stroke-linecap="round"/>
-        <circle cx="23" cy="72" r="6" fill="#FF8A80" opacity="0.7"/>
-        <circle cx="77" cy="72" r="6" fill="#FF8A80" opacity="0.7"/>
-      </svg>
+    <div class="top-area">
+      <div class="stats-bar">
+        <div class="stat-item happiness-row" id="click-happiness">
+          💖 Hạnh phúc: <strong id="val-happiness">0</strong> 
+          <span class="exp-text">(<span id="val-exp">0</span>/500)</span>
+        </div>
+        <div class="resource-row">
+          <div class="stat-item" id="click-seeds">🌱 <strong id="val-seeds">0</strong></div>
+          <div class="stat-item" id="click-fruits">🍎 <strong id="val-fruits">0</strong></div>
+          <div class="stat-item" id="click-coins">💵 <strong id="val-coins">0</strong></div>
+          <div class="stat-item" title="Bình tưới">💦 <strong id="val-watercans">0</strong></div>
+          <div class="stat-item" title="Phân bón">📦 <strong id="val-fertilizers">0</strong></div>
+        </div>
+      </div>
+      
+      <!-- MENU BAR & ENERGY RING -->
+      <div class="menu-container">
+        <div class="hamburger-wrapper">
+            <div class="hamburger-btn" id="hamburger-btn">☰</div>
+            <div class="dropdown-menu" id="dropdown-menu">
+              <button class="btn btn-farm" id="btn-farm-full"><span>Vườn Nhà Ốc 🏡</span></button>
+              <button class="btn btn-seed" id="btn-daily-seed"><span>Hạt giống 🌱</span></button>
+              <button class="btn btn-inventory" id="btn-inventory"><span>Nhà kho 🎒</span></button>
+              <button class="btn btn-market" id="btn-market"><span>Chợ 🏪</span></button>
+            </div>
+        </div>
+        <!-- Thanh năng lượng dạng vòng rỗng -->
+        <div class="energy-ring" id="energy-btn">
+            <svg id="energy-svg-group" width="44" height="44"></svg>
+        </div>
+      </div>
     </div>
-    <div class="shadow"></div>
-    <p class="countdown-text" id="countdown">Đang tải...</p>
 
-    <div class="event-section">
-      <button id="btn-thattich">
-        <svg viewBox="0 0 512 512"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0s208 93.1 208 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
-        Nguyện Ước Thất Tịch
-      </button>
+    <div class="scene-wrapper">
+      <div class="scene">
+        <div class="speech-bubble style-1" id="chat-bubble" onclick="openReaderModal()">💌</div>
+        
+        <div class="egg-float">
+          <div class="egg-interactive" id="egg-interactive">
+            <svg viewBox="-5 -5 160 200" width="160" height="200">
+              <g transform="translate(25, 10)">
+                <path d="M50 0 C20 0 0 50 0 80 C0 110 20 120 50 120 C80 120 100 110 100 80 C100 50 80 0 50 0 Z" fill="#FFF8E7" stroke="#FFE0B2" stroke-width="3"/>
+                <g id="egg-face"></g>
+              </g>
+              <g transform="translate(0, 110)">
+                <path d="M 15 25 Q 75 75 135 25 C 145 10 5 10 15 25 Z" fill="#E6C2A5" stroke="#C5A485" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M 25 30 L 45 45 M 65 50 L 90 35 M 105 40 L 125 25" stroke="#C5A485" stroke-width="2.5" stroke-linecap="round"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="shadow"></div>
+      </div>
+      <p class="countdown-text" id="countdown">Đang tải...</p>
+    </div>
+
+    <div class="control-section">
+      <div class="action-bar">
+        <div class="feed-slider-container" id="feed-slider"></div>
+        <div class="mini-farm-wrapper">
+          <div class="mini-farm-nav">
+             <div class="mini-farm-nav-btn" onclick="changeMiniFarmRow(-1)">▲</div>
+             <div class="mini-farm-nav-btn" onclick="changeMiniFarmRow(1)">▼</div>
+          </div>
+          <div class="mini-farm-plots" id="mini-farm-container"></div>
+        </div>
+      </div>
+      <div class="sync-status" id="sync-status">Đang kết nối nhà chung...</div>
     </div>
   </div>
 
-  <div class="overlay" id="wish-overlay">
-    <div class="wish-paper">
-      <span class="close-paper" id="close-wish">&times;</span>
-      <h3 class="paper-title">Hỷ Thước Se Duyên</h3>
-      <label class="wish-label" for="wish-content">Lời nguyện ước của bạn:</label>
-      <textarea id="wish-content" placeholder="Viết những mong muốn của bạn vào đây..."></textarea>
-      <button id="btn-send-wish">Gửi Nguyện Ước</button>
+  <!-- Modal Đọc Thư -->
+  <div id="mail-reader-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h3 class="modal-title" id="mail-reader-title">Thư gửi Yêu 💌</h3>
+      <div class="mail-content-box" id="mail-reader-content">Nội dung thư...</div>
+      
+      <div id="mail-reader-attachment" class="mail-attachment" style="display: none;">
+        <div style="font-weight: 700; color: #2E7D32;">🎁 Vật phẩm đính kèm:</div>
+        <div id="mail-attach-list"></div>
+        <button class="modal-btn btn-ok" style="margin-top: 5px; width: 100%;" id="btn-claim-attachment" onclick="claimMailAttachment()">Nhận quà</button>
+      </div>
+      
+      <div class="modal-actions">
+        <!-- Nút xóa thư và Nút đóng -->
+        <button class="modal-btn btn-cancel" style="display: block; background: #FFCDD2; color: #C62828;" onclick="deleteMail()">Xóa thư</button>
+        <button class="modal-btn btn-ok" onclick="closeReaderModal()">Đóng</button>
+      </div>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <div id="farm-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h3 class="modal-title" style="color: #4CAF50;">Vườn Nhà Ốc 🏡</h3>
+      <p class="modal-desc" style="margin-bottom: 15px; font-size: 0.85rem;">Nhấp vào ô để gieo hạt, tưới nước hoặc thu hoạch nhé!</p>
+      <div class="farm-grid" id="farm-grid"></div>
+      <div class="modal-actions">
+        <button class="modal-btn btn-ok" style="background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%); color: #fff;" onclick="document.getElementById('farm-modal').classList.remove('active')">Đóng Vườn</button>
+      </div>
+    </div>
+  </div>
 
+  <div id="custom-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h3 class="modal-title" id="modal-title">Tiêu đề</h3>
+      <p class="modal-desc" id="modal-desc">Nội dung thông báo</p>
+      <input type="number" class="modal-input" id="modal-input" />
+      <div class="modal-actions">
+        <button class="modal-btn btn-cancel" id="modal-btn-cancel">Hủy</button>
+        <button class="modal-btn btn-ok" id="modal-btn-ok">Đồng ý</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cheat-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h3 class="modal-title">Bảng Chỉnh Sửa 🤫</h3>
+      <div style="overflow-y: auto; text-align: left; margin-bottom: 15px; padding-right: 5px;">
+        
+        <table class="cheat-table">
+          <tr><td>💖 Hạnh phúc:</td><td><input type="number" id="cheat-happiness" min="0"></td></tr>
+          <tr><td>✨ Kinh nghiệm:</td><td><input type="number" id="cheat-exp" min="0"></td></tr>
+          <tr><td>🌱 Hạt giống:</td><td><input type="number" id="cheat-seeds" min="0"></td></tr>
+          <tr><td>💵 Tiền Đô:</td><td><input type="number" id="cheat-coins" min="0"></td></tr>
+          <tr><td>💦 Bình tưới:</td><td><input type="number" id="cheat-watercans" min="0"></td></tr>
+          <tr><td>📦 Phân bón:</td><td><input type="number" id="cheat-fertilizers" min="0"></td></tr>
+          <tr><td>🟫 Đất đã mở (0-6):</td><td><input type="number" id="cheat-plots" min="0" max="6"></td></tr>
+          <!-- CHỈNH SỬA NĂNG LƯỢNG -->
+          <tr><td style="color: #4CAF50;">🍗 Năng lượng (0-24):</td><td><input type="number" id="cheat-energy" min="0" max="24"></td></tr>
+          <tr><td colspan="2" style="border-bottom:none; padding-bottom:0;"><strong style="color: #E65100; font-size: 0.85rem;">Tùy chỉnh chế độ ăn:</strong></td></tr>
+          <tr>
+            <td>
+                <label style="display:flex; align-items:center; font-size: 0.85rem; cursor:pointer;">
+                    <input type="radio" name="energy-mode" id="mode-epf" value="epf"> 1 quả tăng X vạch:
+                </label>
+            </td>
+            <td><input type="number" id="cheat-energy-per-fruit" min="1" max="24" title="Số vạch"></td>
+          </tr>
+          <tr>
+            <td>
+                <label style="display:flex; align-items:center; font-size: 0.85rem; cursor:pointer;">
+                    <input type="radio" name="energy-mode" id="mode-fpe" value="fpe"> Y quả tăng 1 vạch:
+                </label>
+            </td>
+            <td><input type="number" id="cheat-fruits-per-energy" min="1" max="100" title="Số quả"></td>
+          </tr>
+        </table>
+        
+        <!-- KHU VỰC SOẠN THƯ -->
+        <hr style="border: 0; border-top: 2px dashed #ffecd2; margin: 15px 0;">
+        <h4 style="margin: 0 0 10px; color: #E65100; text-align: center;">Soạn Thư Tình 💌</h4>
+        <div class="cheat-compose-section">
+          <input type="text" id="cheat-mail-title" placeholder="Tiêu đề thư..." style="width: 100%; padding: 8px; font-family: 'Quicksand'; font-weight: bold; border: 1px solid #FFB74D; border-radius: 8px; margin-bottom: 8px; outline: none; color:#5D4037;">
+          <textarea id="cheat-mail-content" style="width: 100%; height: 60px; padding: 8px; font-family: 'Quicksand'; font-size: 0.9rem; border: 1px solid #FFB74D; border-radius: 8px; margin-bottom: 8px; resize: none; outline: none; color:#5D4037;" placeholder="Nội dung thư..."></textarea>
+          
+          <div class="cheat-input-group">
+            <span>Kiểu dáng thư:</span>
+            <select id="cheat-mail-style">
+              <option value="1">Cổ điển (Chữ nhật)</option>
+              <option value="2">Yêu thương (Bo tròn)</option>
+              <option value="3">Dễ thương (Tròn)</option>
+              <option value="4">Mộng mơ (Đám mây)</option>
+            </select>
+          </div>
+
+          <div class="cheat-input-group">
+            <span>Căn lề:</span>
+            <select id="cheat-mail-align">
+              <option value="left">Trái</option>
+              <option value="center">Giữa</option>
+              <option value="right">Phải</option>
+            </select>
+          </div>
+          
+          <div class="cheat-input-group">
+            <span>Màu chữ:</span>
+            <input type="color" id="cheat-mail-color" value="#5D4037">
+          </div>
+          
+          <div class="cheat-input-group" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+            <span>Đính kèm quà (Nhập số lượng):</span>
+            <div id="cheat-mail-attach-grid" class="cheat-fruit-grid" style="grid-template-columns: repeat(3, 1fr); max-height: 150px; overflow-y: auto; width: 100%; padding-right: 5px;">
+                <!-- Sinh tự động bằng JS -->
+            </div>
+          </div>
+          <button class="btn btn-inventory" style="margin-top: 10px;" onclick="cheatSendMail()">Gửi Thư Ngay 🚀</button>
+        </div>
+
+        <hr style="border: 0; border-top: 2px dashed #ffecd2; margin: 15px 0;">
+        <h4 style="margin: 0 0 10px; color: #4CAF50; text-align: center;">Tác Động Ô Đất</h4>
+        <div style="display: flex; gap: 8px; margin-bottom: 10px; justify-content: center; align-items: center; flex-wrap: wrap;">
+            <div>
+                <label style="font-size: 0.85rem; font-weight: bold; color: #5D4037;">Chọn ô:</label>
+                <select id="cheat-plot-select" style="padding: 6px; border-radius: 8px; border: 2px solid #ffecd2; font-family: 'Quicksand'; outline: none; font-weight: bold; color: #5D4037;">
+                    <option value="0">Ô 1</option><option value="1">Ô 2</option><option value="2">Ô 3</option>
+                    <option value="3">Ô 4</option><option value="4">Ô 5</option><option value="5">Ô 6</option>
+                    <option value="6">Ô 7</option><option value="7">Ô 8</option><option value="8">Ô 9</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size: 0.85rem; font-weight: bold; color: #5D4037;">Thời gian (phút):</label>
+                <input type="number" id="cheat-plot-time" style="width: 70px; padding: 6px; border-radius: 8px; border: 2px solid #ffecd2; outline: none; font-family: 'Quicksand'; font-weight: bold; color: #5D4037; text-align: center;" value="0">
+            </div>
+        </div>
+
+        <div class="cheat-plot-action-grid">
+            <button class="modal-btn" style="background:#FFE0B2; color:#E65100; font-size: 0.85rem; padding: 8px;" onclick="cheatPlotAction('thirsty')">Làm Héo 💦</button>
+            <button class="modal-btn" style="background:#E3F2FD; color:#1565C0; font-size: 0.85rem; padding: 8px;" onclick="cheatPlotAction('fresh')">Làm Tươi 🌱</button>
+            <button class="modal-btn" style="background:#FFCDD2; color:#C62828; font-size: 0.85rem; padding: 8px;" onclick="cheatPlotAction('clear')">Bỏ Cây 🟫</button>
+            <button class="modal-btn" style="background:#C8E6C9; color:#2E7D32; font-size: 0.85rem; padding: 8px;" onclick="cheatPlotAction('plant')">Trồng Mới 🍎</button>
+            <button class="modal-btn" style="background:#E1BEE7; color:#6A1B9A; font-size: 0.85rem; padding: 8px; grid-column: span 2;" onclick="cheatPlotAction('set_time')">Cài Đặt Thời Gian ⏳</button>
+        </div>
+
+        <hr style="border: 0; border-top: 2px dashed #ffecd2; margin: 15px 0;">
+        <h4 style="margin: 0 0 10px; color: #ff6b6b; text-align: center;">Kho Trái Cây</h4>
+        <div class="cheat-fruit-grid" id="cheat-fruit-grid"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn btn-cancel" style="display: block;" onclick="closeCheatMenu(false)">Hủy</button>
+        <button class="modal-btn btn-ok" onclick="closeCheatMenu(true)">Lưu Lại</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="inventory-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h3 class="modal-title">Nhà kho của Yêu 🎒</h3>
+      <p class="modal-desc" style="margin-bottom: 15px; font-size: 0.85rem;">Tất cả trái cây thu hoạch được cất ở đây nè!</p>
+      <div class="inventory-grid" id="inventory-grid"></div>
+      <div class="modal-actions">
+        <button class="modal-btn btn-ok" onclick="document.getElementById('inventory-modal').classList.remove('active')">Đóng Kho</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="market-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h3 class="modal-title" style="color: #689F38;">Chợ & Vật Tư 🏪</h3>
+      <p class="modal-desc" style="margin-bottom: 5px; font-size: 0.85rem;">(Yêu đang có: <strong id="market-coin-display" style="color: #E65100;">0</strong> 💵)</p>
+      <div class="market-content">
+        <div class="market-section-title">Khu Bán Nông Sản</div>
+        <div class="market-grid" id="market-sell-grid"></div>
+        <div class="market-section-title">Khu Mua Vật Tư</div>
+        <div class="market-grid" id="market-buy-grid"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn btn-ok" style="background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%); color: #33691E;" onclick="document.getElementById('market-modal').classList.remove('active')">Đóng Chợ</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // MENU DROPDOWN
+    document.getElementById('hamburger-btn').addEventListener('click', function(e) {
+        document.getElementById('dropdown-menu').classList.toggle('active');
+        e.stopPropagation();
+    });
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('dropdown-menu');
+        const btn = document.getElementById('hamburger-btn');
+        if(!menu.contains(e.target) && !btn.contains(e.target)) menu.classList.remove('active');
+    });
+    document.querySelectorAll('.dropdown-menu .btn').forEach(btn => {
+        btn.addEventListener('click', () => document.getElementById('dropdown-menu').classList.remove('active'));
+    });
+
+    // CUSTOM MODAL ALERT
+    let modalResolve = null;
+    function showModal(title, message, mode = "alert", defaultValue = "") {
+      return new Promise((resolve) => {
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-desc').innerText = message;
+        const inputEl = document.getElementById('modal-input');
+        const cancelBtn = document.getElementById('modal-btn-cancel');
+        if (mode === "prompt") {
+          inputEl.style.display = 'block'; inputEl.value = defaultValue; cancelBtn.style.display = 'block'; inputEl.focus();
+        } else if (mode === "confirm") {
+          inputEl.style.display = 'none'; cancelBtn.style.display = 'block';
+        } else {
+          inputEl.style.display = 'none'; cancelBtn.style.display = 'none';
+        }
+        document.getElementById('custom-modal').classList.add('active');
+        modalResolve = resolve;
+      });
+    }
+    function closeModal(isOk) {
+      document.getElementById('custom-modal').classList.remove('active');
+      if (modalResolve) {
+        const isPrompt = document.getElementById('modal-input').style.display === 'block';
+        if (isPrompt) modalResolve(isOk ? document.getElementById('modal-input').value : null);
+        else modalResolve(isOk);
+        modalResolve = null;
+      }
+    }
+    document.getElementById('modal-btn-ok').onclick = () => closeModal(true);
+    document.getElementById('modal-btn-cancel').onclick = () => closeModal(false);
+
+    document.getElementById('btn-farm-full').onclick = () => {
+        document.getElementById('farm-modal').classList.add('active');
+        renderAllPlots(); 
+    };
+
+    // KHUÔN MẶT TRỨNG
+    const faceElement = document.getElementById('egg-face');
+    const faces = {
+      normal: `<circle cx="35" cy="65" r="4.5" fill="#5D4037" /><circle cx="65" cy="65" r="4.5" fill="#5D4037" /><path d="M43 75 Q50 82 57 75" stroke="#5D4037" stroke-width="3" fill="transparent" stroke-linecap="round"/><circle cx="23" cy="72" r="6" fill="#FF8A80" opacity="0.7"/><circle cx="77" cy="72" r="6" fill="#FF8A80" opacity="0.7"/>`,
+      blink: `<line x1="31" y1="65" x2="39" y2="65" stroke="#5D4037" stroke-width="3" stroke-linecap="round"/><line x1="61" y1="65" x2="69" y2="65" stroke="#5D4037" stroke-width="3" stroke-linecap="round"/><path d="M43 75 Q50 82 57 75" stroke="#5D4037" stroke-width="3" fill="transparent" stroke-linecap="round"/><circle cx="23" cy="72" r="6" fill="#FF8A80" opacity="0.7"/><circle cx="77" cy="72" r="6" fill="#FF8A80" opacity="0.7"/>`,
+      happy: `<path d="M32 67 Q35 63 38 67" stroke="#5D4037" stroke-width="3" fill="transparent" stroke-linecap="round"/><path d="M62 67 Q65 63 68 67" stroke="#5D4037" stroke-width="3" fill="transparent" stroke-linecap="round"/><path d="M42 74 Q50 82 58 74" stroke="#5D4037" stroke-width="3.5" fill="transparent" stroke-linecap="round"/><circle cx="23" cy="72" r="6" fill="#FF8A80" opacity="0.7"/><circle cx="77" cy="72" r="6" fill="#FF8A80" opacity="0.7"/>`,
+      surprised: `<circle cx="35" cy="63" r="4.5" fill="#5D4037" /><circle cx="65" cy="63" r="4.5" fill="#5D4037" /><circle cx="50" cy="78" r="4" fill="#5D4037" /><circle cx="23" cy="72" r="6" fill="#FF8A80" opacity="0.7"/><circle cx="77" cy="72" r="6" fill="#FF8A80" opacity="0.7"/>`,
+      sad: `<path d="M30 63 L40 60" stroke="#5D4037" stroke-width="3" stroke-linecap="round"/><path d="M60 60 L70 63" stroke="#5D4037" stroke-width="3" stroke-linecap="round"/><path d="M45 80 Q50 75 55 80" stroke="#5D4037" stroke-width="3" fill="transparent" stroke-linecap="round"/><circle cx="23" cy="72" r="6" fill="#FF8A80" opacity="0.3"/><circle cx="77" cy="72" r="6" fill="#FF8A80" opacity="0.3"/>`
+    };
+
+    // Thêm các Animation mới vào danh sách
+    const animations = ['anim-bounce', 'anim-wiggle', 'anim-squish', 'anim-spin', 'anim-jump', 'anim-wobble', 'anim-heartbeat', 'anim-rubberband'];
+    const eggWrapper = document.getElementById('egg-interactive');
+    
+    // Cờ khóa ngăn chặn spam animation đè nhau
+    let isEggAnimating = false;
+
+    faceElement.innerHTML = faces.normal;
+    setInterval(() => {
+      // Nếu quả trứng đang diễn animation thì chặn không đổi mặt tự động để tránh giật hình
+      if (isEggAnimating) return;
+
+      // Nếu đang quá đói, đảm bảo chuyển về mặt buồn
+      if (gameData && gameData.energy <= 3) {
+          faceElement.innerHTML = faces.sad;
+          if (!eggWrapper.classList.contains('anim-sad')) {
+              eggWrapper.classList.add('anim-sad');
+          }
+          return;
+      }
+      
+      // Xóa mặt buồn nếu có
+      eggWrapper.classList.remove('anim-sad');
+      
+      const rand = Math.random();
+      let nextFace = 'normal';
+      if (rand < 0.1) nextFace = 'blink';
+      else if (rand < 0.2) nextFace = 'happy';
+      else if (rand < 0.3) nextFace = 'surprised';
+      faceElement.innerHTML = faces[nextFace];
+      
+      if (nextFace === 'blink') {
+          setTimeout(() => { 
+              if (!isEggAnimating && gameData.energy > 3) faceElement.innerHTML = faces.normal; 
+          }, 200);
+      }
+    }, 2500);
+    
+    function triggerEggAnimation(face = 'happy') {
+      // Nếu đang diễn ra một animation, lệnh mới sẽ bị bỏ qua -> không bị chồng chéo
+      if (isEggAnimating) return; 
+      isEggAnimating = true;
+
+      // Nếu quá đói, cưỡng ép hiển thị mặt buồn, không có animation vui
+      if (gameData.energy <= 3 && face !== 'shake') {
+          faceElement.innerHTML = faces.sad;
+          animations.forEach(anim => eggWrapper.classList.remove(anim));
+          eggWrapper.classList.add('anim-sad');
+          
+          setTimeout(() => { isEggAnimating = false; }, 600);
+          return;
+      }
+      
+      // Hoạt ảnh từ chối
+      if (face === 'shake') {
+          faceElement.innerHTML = faces.normal;
+          animations.forEach(anim => eggWrapper.classList.remove(anim));
+          eggWrapper.classList.remove('anim-sad'); // Đảm bảo gỡ buồn để nhảy transition
+          
+          void eggWrapper.offsetWidth;
+          eggWrapper.classList.add('anim-shake');
+          
+          setTimeout(() => { 
+              eggWrapper.classList.remove('anim-shake'); 
+              isEggAnimating = false;
+              if (gameData.energy <= 3) {
+                  faceElement.innerHTML = faces.sad;
+                  eggWrapper.classList.add('anim-sad');
+              }
+          }, 500);
+          return;
+      }
+
+      // Xử lý animation vui / bất ngờ
+      faceElement.innerHTML = faces[face];
+      animations.forEach(anim => eggWrapper.classList.remove(anim));
+      eggWrapper.classList.remove('anim-sad'); 
+      
+      void eggWrapper.offsetWidth; // Reflow để khởi động lại CSS Keyframe
+      const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+      eggWrapper.classList.add(randomAnim);
+      
+      setTimeout(() => { 
+          eggWrapper.classList.remove(randomAnim); 
+          isEggAnimating = false;
+          
+          if (gameData.energy <= 3) {
+              faceElement.innerHTML = faces.sad;
+              eggWrapper.classList.add('anim-sad');
+          } else {
+              faceElement.innerHTML = faces.normal; 
+          }
+      }, 600); // 600ms đồng bộ với thời lượng lớn nhất của list animation ở trên
+    }
+    
+    eggWrapper.addEventListener('click', () => triggerEggAnimation('happy'));
+
+    const targetDate = new Date('2026-11-18T00:00:00+07:00');
+    function updateCountdown() {
+      const vnTimeStr = new Date().toLocaleString("en-US", {timeZone: "Asia/Ho_Chi_Minh"});
+      const targetVnTimeStr = targetDate.toLocaleString("en-US", {timeZone: "Asia/Ho_Chi_Minh"});
+      const diffTime = new Date(targetVnTimeStr) - new Date(vnTimeStr);
+      let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      document.getElementById('countdown').innerText = `Còn ${days > 0 ? days : 0} ngày`;
+    }
+    updateCountdown(); setInterval(updateCountdown, 1000 * 60 * 60);
+
+    const CROP_TYPES = ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑'];
+
+    // DỮ LIỆU CƠ BẢN (Năng lượng khởi tạo = 24)
+    let gameData = {
+      lastUpdated: 0,
+      happiness: 0, exp: 0, seeds: 2, fruits: 1, coins: 0, 
+      waterCans: 0, fertilizers: 0, unlockedPlots: 0,
+      energy: 24, lastEnergyUpdate: 0, 
+      energyCheatMode: 'epf', energyPerFruit: 1, fruitsPerEnergy: 1, fruitEatCounter: 0, 
+      lastSeedDate: "", marketDate: "", marketItems: [],
+      inventory: { '🍎': 1 }, 
+      plots: Array(9).fill().map(() => ({ planted: false, type: "", harvestTime: 0, isThirsty: false, lastCheckedTime: 0, waterThresholds: [], isFertilized: false })),
+      letters: [] 
+    };
+    
+    let syncTimeout = null; let isOffline = false;
+    let miniFarmRow = 0; let activeMenuIndex = -1;
+    let currentReadingMailId = null;
+
+    function changeMiniFarmRow(dir) {
+        miniFarmRow += dir;
+        if (miniFarmRow < 0) miniFarmRow = 2;
+        if (miniFarmRow > 2) miniFarmRow = 0;
+        activeMenuIndex = -1; 
+        updateUI();
+    }
+
+    // --- HỆ THỐNG THƯ TỪ ---
+    function checkMailUI() {
+      const bubble = document.getElementById('chat-bubble');
+      if(!gameData.letters || gameData.letters.length === 0) {
+        bubble.style.display = 'none'; return;
+      }
+      bubble.style.display = 'block';
+      const mail = gameData.letters[gameData.letters.length - 1]; 
+      bubble.className = `speech-bubble style-${mail.style || '1'}`;
+      if (!mail.isRead) {
+          bubble.innerHTML = '💌<span style="position:absolute; top:-2px; right:-2px; width:10px; height:10px; background:#ff4d4d; border-radius:50%; border:2px solid #fff; box-shadow:0 0 5px rgba(255,0,0,0.5);"></span>';
+      } else { bubble.innerHTML = '💌'; }
+    }
+
+    window.openReaderModal = function() {
+      if (!gameData.letters || gameData.letters.length === 0) return;
+      const mail = gameData.letters[gameData.letters.length - 1];
+      currentReadingMailId = mail.id;
+      document.getElementById('mail-reader-title').innerText = mail.title || "Thư gửi Yêu 💌";
+      const contentBox = document.getElementById('mail-reader-content');
+      contentBox.innerText = mail.content || "Không có nội dung";
+      contentBox.style.color = mail.color || "#5D4037"; contentBox.style.textAlign = mail.align || "left";
+
+      const attachBox = document.getElementById('mail-reader-attachment');
+      const attachList = document.getElementById('mail-attach-list');
+      const claimBtn = document.getElementById('btn-claim-attachment');
+      
+      if (mail.attachments && Object.keys(mail.attachments).length > 0) {
+        attachBox.style.display = 'flex'; let html = '';
+        for (let [type, count] of Object.entries(mail.attachments)) {
+            let icon = type === 'seeds' ? '🌱' : (type === 'coins' ? '💵' : (type === 'waterCans' ? '💦' : (type === 'fertilizers' ? '📦' : type)));
+            html += `<span style="background: #fff; padding: 4px 8px; border-radius: 8px; border: 1px solid #A5D6A7; color: #2E7D32; display: inline-flex; align-items: center; gap: 4px;">${icon} x${count}</span>`;
+        }
+        attachList.innerHTML = html;
+        if (mail.isClaimed) { claimBtn.innerText = "Đã nhận"; claimBtn.disabled = true; } 
+        else { claimBtn.innerText = "Nhận quà"; claimBtn.disabled = false; }
+      } else { attachBox.style.display = 'none'; }
+      mail.isRead = true; saveGame(); document.getElementById('mail-reader-modal').classList.add('active');
+    }
+
+    window.closeReaderModal = function() {
+      document.getElementById('mail-reader-modal').classList.remove('active'); currentReadingMailId = null;
+    }
+
+    window.claimMailAttachment = function() {
+      if (!currentReadingMailId) return;
+      const mail = gameData.letters.find(l => l.id === currentReadingMailId);
+      if (!mail || mail.isClaimed || !mail.attachments || Object.keys(mail.attachments).length === 0) return;
+      for (let [type, count] of Object.entries(mail.attachments)) {
+        if (type === 'seeds') gameData.seeds += count;
+        else if (type === 'coins') gameData.coins += count;
+        else if (type === 'waterCans') gameData.waterCans += count;
+        else if (type === 'fertilizers') gameData.fertilizers += count;
+        else {
+          if (!gameData.inventory) gameData.inventory = {};
+          if (!gameData.inventory[type]) gameData.inventory[type] = 0;
+          gameData.inventory[type] += count; gameData.fruits += count;
+        }
+      }
+      mail.isClaimed = true;
+      document.getElementById('btn-claim-attachment').innerText = "Đã nhận";
+      document.getElementById('btn-claim-attachment').disabled = true;
+      saveGame(); showModal("Đã nhận quà! 🎁", `Tất cả vật phẩm đã được chuyển vào túi đồ rui ne!`);
+    }
+
+    window.deleteMail = function() {
+      if (!currentReadingMailId) return;
+      gameData.letters = gameData.letters.filter(l => l.id !== currentReadingMailId);
+      closeReaderModal(); saveGame(); showModal("Đã xóa thư 🗑️", "Lá thư này đã được xóa khỏi hòm thư.");
+    }
+
+    function renderCheatMailAttachGrid() {
+        const grid = document.getElementById('cheat-mail-attach-grid'); let html = '';
+        const basic = [ {id: 'seeds', icon: '🌱'}, {id: 'coins', icon: '💵'}, {id: 'waterCans', icon: '💦'}, {id: 'fertilizers', icon: '📦'} ];
+        basic.forEach(item => { html += `<div class="cheat-fruit-item"><span>${item.icon}</span><input type="number" id="mail-attach-${item.id}" value="0" min="0"></div>`; });
+        CROP_TYPES.forEach((fruit, idx) => { html += `<div class="cheat-fruit-item"><span>${fruit}</span><input type="number" id="mail-attach-fruit-${idx}" value="0" min="0"></div>`; });
+        grid.innerHTML = html;
+    }
+
+    window.cheatSendMail = function() {
+      const title = document.getElementById('cheat-mail-title').value.trim() || "Thư gửi Yêu 💌";
+      const content = document.getElementById('cheat-mail-content').value.trim();
+      if (!content) { alert("Nhập nội dung thư nhé!"); return; }
+      const align = document.getElementById('cheat-mail-align').value;
+      const color = document.getElementById('cheat-mail-color').value;
+      const style = document.getElementById('cheat-mail-style').value;
+      
+      let attachments = {};
+      ['seeds', 'coins', 'waterCans', 'fertilizers'].forEach(id => {
+          let val = parseInt(document.getElementById(`mail-attach-${id}`).value) || 0;
+          if(val > 0) attachments[id] = val;
+      });
+      CROP_TYPES.forEach((fruit, idx) => {
+          let val = parseInt(document.getElementById(`mail-attach-fruit-${idx}`).value) || 0;
+          if(val > 0) attachments[fruit] = val;
+      });
+
+      const newMail = { id: Date.now().toString(), title: title, content: content, align: align, color: color, style: style, attachments: attachments, isRead: false, isClaimed: false };
+      if(!gameData.letters) gameData.letters = [];
+      gameData.letters.push(newMail);
+      document.getElementById('cheat-mail-title').value = ""; document.getElementById('cheat-mail-content').value = "";
+      renderCheatMailAttachGrid(); saveGame(); alert("Đã gửi thư cho Yêu thành công!");
+    }
+
+    // --- MÃ BÍ MẬT CHEAT BẢNG ---
+    const secretCode = ['H', 'Q', 'G', 'H', 'G', 'G', 'Q', 'Q'];
+    let currentStep = 0;
+    function handleSecretClick(type) {
+      if (type === secretCode[currentStep]) {
+        currentStep++;
+        if (currentStep === secretCode.length) { openCheatMenu(); currentStep = 0; }
+      } else { currentStep = (type === secretCode[0]) ? 1 : 0; }
+    }
+
+    function openCheatMenu() {
+      document.getElementById('cheat-happiness').value = gameData.happiness || 0;
+      document.getElementById('cheat-exp').value = gameData.exp || 0;
+      document.getElementById('cheat-seeds').value = gameData.seeds || 0;
+      document.getElementById('cheat-coins').value = gameData.coins || 0;
+      document.getElementById('cheat-watercans').value = gameData.waterCans || 0;
+      document.getElementById('cheat-fertilizers').value = gameData.fertilizers || 0;
+      document.getElementById('cheat-plots').value = gameData.unlockedPlots || 0;
+      
+      document.getElementById('cheat-energy').value = gameData.energy;
+      document.getElementById('cheat-energy-per-fruit').value = gameData.energyPerFruit || 1;
+      document.getElementById('cheat-fruits-per-energy').value = gameData.fruitsPerEnergy || 1;
+      
+      if (gameData.energyCheatMode === 'fpe') {
+          document.getElementById('mode-fpe').checked = true;
+      } else {
+          document.getElementById('mode-epf').checked = true;
+      }
+      
+      const fruitGrid = document.getElementById('cheat-fruit-grid');
+      fruitGrid.innerHTML = '';
+      CROP_TYPES.forEach((fruit, idx) => {
+        const count = gameData.inventory[fruit] || 0;
+        fruitGrid.innerHTML += `<div class="cheat-fruit-item"><span>${fruit}</span><input type="number" id="cheat-fruit-${idx}" data-fruit="${fruit}" value="${count}" min="0"></div>`;
+      });
+      renderCheatMailAttachGrid(); document.getElementById('cheat-modal').classList.add('active');
+    }
+
+    window.cheatPlotAction = function(action) {
+        const plotIdx = parseInt(document.getElementById('cheat-plot-select').value);
+        const plot = gameData.plots[plotIdx];
+        if (plotIdx >= 3 + gameData.unlockedPlots) return; 
+
+        if (action === 'clear') {
+            gameData.plots[plotIdx] = { planted: false, type: "", harvestTime: 0, isThirsty: false, isFertilized: false, lastCheckedTime: 0, waterThresholds: [] };
+        } else if (action === 'plant') {
+            const randomCrop = CROP_TYPES[Math.floor(Math.random() * CROP_TYPES.length)];
+            const totalDuration = 3 * 3600000;
+            gameData.plots[plotIdx] = { planted: true, type: randomCrop, harvestTime: Date.now() + totalDuration, waterThresholds: [Date.now() + totalDuration / 2], isThirsty: false, isFertilized: false, lastCheckedTime: Date.now() };
+        } else if (action === 'thirsty') {
+            if (plot.planted && plot.harvestTime > Date.now()) plot.isThirsty = true;
+        } else if (action === 'fresh') {
+            if (plot.planted) plot.isThirsty = false;
+        } else if (action === 'set_time') {
+            if (plot.planted && plot.harvestTime > Date.now()) {
+                const minutes = parseInt(document.getElementById('cheat-plot-time').value) || 0;
+                const newDuration = minutes * 60000;
+                plot.harvestTime = Date.now() + newDuration;
+                plot.waterThresholds = [Date.now() + newDuration / 2];
+                plot.isThirsty = false; 
+            }
+        }
+        activeMenuIndex = -1; saveGame(); renderAllPlots();
+    }
+
+    window.closeCheatMenu = function(isSave) {
+      if (isSave) {
+        gameData.happiness = parseInt(document.getElementById('cheat-happiness').value) || 0;
+        gameData.seeds = parseInt(document.getElementById('cheat-seeds').value) || 0;
+        gameData.coins = parseInt(document.getElementById('cheat-coins').value) || 0;
+        gameData.waterCans = parseInt(document.getElementById('cheat-watercans').value) || 0;
+        gameData.fertilizers = parseInt(document.getElementById('cheat-fertilizers').value) || 0;
+        
+        let plotsVal = parseInt(document.getElementById('cheat-plots').value) || 0;
+        gameData.unlockedPlots = Math.min(6, Math.max(0, plotsVal));
+        
+        let expVal = parseInt(document.getElementById('cheat-exp').value) || 0;
+        if (expVal >= 500) { gameData.happiness += Math.floor(expVal / 500); gameData.exp = expVal % 500; } 
+        else { gameData.exp = expVal; }
+
+        let cheatEnergy = parseInt(document.getElementById('cheat-energy').value) || 0;
+        gameData.energy = Math.min(24, Math.max(0, cheatEnergy));
+        
+        let cheatEPF = parseInt(document.getElementById('cheat-energy-per-fruit').value) || 1;
+        gameData.energyPerFruit = Math.min(24, Math.max(1, cheatEPF));
+        
+        let cheatFPE = parseInt(document.getElementById('cheat-fruits-per-energy').value) || 1;
+        gameData.fruitsPerEnergy = Math.max(1, cheatFPE);
+        
+        gameData.energyCheatMode = document.getElementById('mode-fpe').checked ? 'fpe' : 'epf';
+        gameData.fruitEatCounter = 0; // Đặt lại bộ đếm cho chế độ mới
+
+        gameData.inventory = {};
+        let totalFruitsCount = 0;
+        CROP_TYPES.forEach((fruit, idx) => {
+          const inputEl = document.getElementById(`cheat-fruit-${idx}`);
+          if (inputEl) {
+            const count = parseInt(inputEl.value) || 0;
+            if (count > 0) { gameData.inventory[fruit] = count; totalFruitsCount += count; }
+          }
+        });
+        gameData.fruits = totalFruitsCount;
+        saveGame();
+      }
+      document.getElementById('cheat-modal').classList.remove('active');
+    }
+
+    document.getElementById('click-happiness').addEventListener('click', () => handleSecretClick('H'));
+    document.getElementById('click-seeds').addEventListener('click', () => handleSecretClick('G'));
+    document.getElementById('click-fruits').addEventListener('click', () => handleSecretClick('Q'));
+
+    function checkPlotCompat() {
+      const now = Date.now();
+      if (typeof gameData.inventory === 'undefined') { gameData.inventory = {}; if (gameData.fruits > 0) gameData.inventory['🍎'] = gameData.fruits; }
+      if (typeof gameData.coins === 'undefined') gameData.coins = 0;
+      if (typeof gameData.waterCans === 'undefined') gameData.waterCans = 0;
+      if (typeof gameData.fertilizers === 'undefined') gameData.fertilizers = 0;
+      if (typeof gameData.unlockedPlots === 'undefined') gameData.unlockedPlots = 0;
+      if (typeof gameData.marketDate === 'undefined') gameData.marketDate = "";
+      if (typeof gameData.marketItems === 'undefined') gameData.marketItems = [];
+      if (typeof gameData.letters === 'undefined') gameData.letters = []; 
+      
+      // Khởi tạo Dữ liệu Năng lượng (Cập nhật lên bản 24)
+      if (typeof gameData.energy === 'undefined') gameData.energy = 24;
+      if (typeof gameData.lastEnergyUpdate === 'undefined') gameData.lastEnergyUpdate = now;
+      if (typeof gameData.energyCheatMode === 'undefined') gameData.energyCheatMode = 'epf';
+      if (typeof gameData.energyPerFruit === 'undefined') gameData.energyPerFruit = 1;
+      if (typeof gameData.fruitsPerEnergy === 'undefined') gameData.fruitsPerEnergy = 1;
+      if (typeof gameData.fruitEatCounter === 'undefined') gameData.fruitEatCounter = 0;
+
+      while(gameData.plots.length < 9) {
+        gameData.plots.push({ planted: false, type: "", harvestTime: 0, isThirsty: false, lastCheckedTime: 0, waterThresholds: [], isFertilized: false });
+      }
+
+      gameData.plots.forEach(plot => {
+          if (plot.planted) {
+              if (typeof plot.isThirsty === 'undefined') plot.isThirsty = false;
+              if (typeof plot.isFertilized === 'undefined') plot.isFertilized = false;
+              if (!plot.lastCheckedTime) plot.lastCheckedTime = now;
+              if (!plot.waterThresholds) plot.waterThresholds = [];
+          }
+      });
+    }
+
+    function loadGame() {
+      const statusText = document.getElementById('sync-status');
+      if (typeof google === 'undefined' || typeof google.script === 'undefined') {
+        isOffline = true;
+        statusText.innerText = "Chế độ trải nghiệm thử"; statusText.style.color = "#FF9800";
+        checkPlotCompat(); updateUI(); return;
+      }
+      google.script.run
+        .withSuccessHandler(function(serverData) {
+          if (serverData) {
+            gameData = serverData;
+            if(typeof gameData.exp === 'undefined') gameData.exp = 0;
+            checkPlotCompat();
+            statusText.innerText = "✓ Đang trực tuyến";
+          } else {
+            saveGame(true); statusText.innerText = "Đã tạo nhà chung mới";
+          }
+          statusText.style.color = "#4CAF50"; setTimeout(() => statusText.innerText = "", 3000); updateUI();
+        })
+        .withFailureHandler(function(err) {
+          isOffline = true; statusText.innerText = "Mạng yếu! Đang chơi ngoại tuyến."; statusText.style.color = "#F44336"; checkPlotCompat(); updateUI();
+        })
+        .getGameDataFromSheet();
+    }
+
+    function saveGame(isInit = false) {
+      if (!isInit) gameData.lastUpdated = Date.now();
+      updateUI(); 
+      if (isOffline || typeof google === 'undefined') return;
+      const statusText = document.getElementById('sync-status');
+      statusText.innerText = "Đang đồng bộ..."; statusText.style.color = "#FF9800";
+      clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(() => {
+        google.script.run
+          .withSuccessHandler(function(serverData) {
+            if (serverData && serverData.lastUpdated) { gameData.lastUpdated = serverData.lastUpdated; }
+            statusText.innerText = "✓ Đã lưu"; statusText.style.color = "#4CAF50"; setTimeout(() => statusText.innerText = "", 2000);
+          })
+          .withFailureHandler(function(err) {
+            statusText.innerText = "Đồng bộ chậm (Mạng hơi yếu)"; statusText.style.color = "#F44336";
+          })
+          .saveGameDataToSheet(gameData);
+      }, 1000);
+    }
+
+    function backgroundSync() {
+      if (isOffline || typeof google === 'undefined') return;
+      google.script.run
+        .withSuccessHandler(function(serverData) {
+          if (serverData && serverData.lastUpdated > gameData.lastUpdated) {
+            gameData = serverData;
+            if(typeof gameData.exp === 'undefined') gameData.exp = 0;
+            checkPlotCompat(); updateUI();
+            const statusText = document.getElementById('sync-status');
+            statusText.innerText = "↓ Yêu vừa vào chăm sóc nông trại đấy!"; statusText.style.color = "#ff6b6b";
+            triggerEggAnimation('surprised'); setTimeout(() => statusText.innerText = "", 3000);
+          }
+        }).getGameDataFromSheet();
+    }
+    setInterval(backgroundSync, 20000);
+
+    async function checkDailySeeds() {
+      const today = new Date().toDateString();
+      if (gameData.lastSeedDate !== today) {
+        const reward = Math.floor(Math.random() * 5) + 1; 
+        gameData.seeds += reward; gameData.lastSeedDate = today; saveGame();
+        await showModal("Ngày mới ngọt ngào! 🌅", `Chào ngày mới! Vườn của yêu nhận được ${reward} hạt giống. 🥰`);
+      } else {
+        await showModal("Hôm nay đã nhận hạt giống rồi!", "Hôm nay yêu đã lấy hạt giống rồi. Cùng đợi ngày mai để lấy tiếp nhé! 💕");
+      }
+    }
+
+    // --- XỬ LÝ THỜI GIAN & TỤT NĂNG LƯỢNG ---
+    function processEnergy() {
+      const now = Date.now();
+      let msPassed = now - gameData.lastEnergyUpdate;
+      let hoursPassed = Math.floor(msPassed / 3600000);
+      
+      if (hoursPassed > 0) {
+        let needsSave = false;
+        for (let i = 0; i < hoursPassed; i++) {
+          if (gameData.energy > 0) {
+            gameData.energy--;
+            if (gameData.energy === 0) {
+              gameData.exp -= 10; // Chạm 0 trừ 10 exp
+              needsSave = true;
+            }
+          } else {
+            gameData.exp -= 2; // Giữ nguyên mức 0 trừ 2 exp/giờ
+            needsSave = true;
+          }
+        }
+        
+        // Cân bằng exp nếu bị âm (tụt cấp hạnh phúc)
+        while (gameData.exp < 0) {
+          if (gameData.happiness > 0) {
+            gameData.happiness--;
+            gameData.exp += 500;
+          } else {
+            gameData.exp = 0;
+            break;
+          }
+        }
+        
+        gameData.lastEnergyUpdate += hoursPassed * 3600000; // Cập nhật lại mốc tg
+        if (needsSave) saveGame();
+      }
+    }
+
+    function processTimeForPlots() {
+      const now = Date.now();
+      let needsSave = false;
+      gameData.plots.forEach(plot => {
+        if (!plot.planted) return;
+        if (!plot.lastCheckedTime) plot.lastCheckedTime = now;
+        while (plot.lastCheckedTime < now) {
+          const step = Math.min(now - plot.lastCheckedTime, 60000); 
+          if (plot.isThirsty) { plot.harvestTime += (step / 2); }
+          const timeLeft = plot.harvestTime - (plot.lastCheckedTime + step);
+          if (timeLeft <= 0) { plot.isThirsty = false; } 
+          else if (!plot.isThirsty && plot.waterThresholds && plot.waterThresholds.length > 0) {
+            if (timeLeft <= plot.waterThresholds[0]) {
+              plot.isThirsty = true; plot.waterThresholds.shift(); needsSave = true;
+            }
+          }
+          plot.lastCheckedTime += step;
+        }
+      });
+      if (needsSave) saveGame();
+    }
+
+    // --- VẼ THANH NĂNG LƯỢNG VÒNG TRÒN RỖNG (12 PHẦN, ĐÈ LỚP) ---
+    function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+      const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+      return {
+        x: centerX + (radius * Math.cos(angleInRadians)),
+        y: centerY + (radius * Math.sin(angleInRadians))
+      };
+    }
+
+    function describeArc(x, y, innerRadius, outerRadius, startAngle, endAngle) {
+      const startIn = polarToCartesian(x, y, innerRadius, endAngle);
+      const endIn = polarToCartesian(x, y, innerRadius, startAngle);
+      const startOut = polarToCartesian(x, y, outerRadius, endAngle);
+      const endOut = polarToCartesian(x, y, outerRadius, startAngle);
+
+      const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+
+      return [
+        "M", startIn.x, startIn.y,
+        "L", startOut.x, startOut.y,
+        "A", outerRadius, outerRadius, 0, largeArcFlag, 0, endOut.x, endOut.y,
+        "L", endIn.x, endIn.y,
+        "A", innerRadius, innerRadius, 0, largeArcFlag, 1, startIn.x, startIn.y,
+        "Z"
+      ].join(" ");
+    }
+
+    function renderEnergyUI() {
+      const svg = document.getElementById('energy-svg-group');
+      svg.innerHTML = '';
+      
+      // Giảm rOut một chút để nhường không gian cho viền dày 
+      const cx = 22, cy = 22, rIn = 12, rOut = 20; 
+
+      for (let i = 0; i < 12; i++) {
+        const startAngle = i * 30; // 360 / 12 = 30 độ (12 thanh)
+        const endAngle = (i + 1) * 30;
+        
+        let fillColor = 'rgba(255,255,255,0.7)'; // Rỗng mặc định
+        
+        // Logic tính toán xếp lớp giống Boss Health Bar
+        if (gameData.energy > i + 12) {
+            fillColor = '#4CAF50'; 
+        } else if (gameData.energy > i) {
+            if (gameData.energy <= 3) {
+                fillColor = '#F44336'; 
+            } else {
+                fillColor = '#FFC107'; 
+            }
+        }
+        
+        // Cập nhật viền dày và rõ ràng
+        const strokeColor = '#FF9800'; 
+        const strokeWidth = 2.5;
+        
+        const pathData = describeArc(cx, cy, rIn, rOut, startAngle, endAngle);
+        svg.innerHTML += `<path d="${pathData}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeWidth}" stroke-linejoin="round" />`;
+      }
+    }
+
+    function updateUI() {
+      processEnergy(); 
+      
+      document.getElementById('val-happiness').innerText = gameData.happiness;
+      document.getElementById('val-exp').innerText = gameData.exp || 0;
+      document.getElementById('val-seeds').innerText = gameData.seeds;
+      document.getElementById('val-fruits').innerText = gameData.fruits;
+      document.getElementById('val-coins').innerText = gameData.coins || 0;
+      document.getElementById('val-watercans').innerText = gameData.waterCans || 0;
+      document.getElementById('val-fertilizers').innerText = gameData.fertilizers || 0;
+      
+      processTimeForPlots(); renderAllPlots(); renderFeedSlider(); checkMailUI(); renderEnergyUI();
+    }
+
+    function renderFeedSlider() {
+      const container = document.getElementById('feed-slider');
+      if (!container) return; container.innerHTML = ''; let hasItems = false;
+      if (gameData.inventory) {
+        for (const [type, count] of Object.entries(gameData.inventory)) {
+          if (count > 0) {
+            hasItems = true; const itemDiv = document.createElement('div');
+            itemDiv.className = 'feed-item'; itemDiv.innerHTML = `<div class="f-icon">${type}</div><div class="f-count">x${count}</div>`;
+            itemDiv.onclick = () => feedSpecificFruit(type); container.appendChild(itemDiv);
+          }
+        }
+      }
+      if (!hasItems) container.innerHTML = '<div class="feed-empty-msg">Kho rỗng, hãy thu hoạch thêm quả nhé! 🍎</div>';
+    }
+
+    window.feedSpecificFruit = async function(type) {
+      if (!gameData.inventory || !gameData.inventory[type] || gameData.inventory[type] <= 0) return;
+      
+      // Kiểm tra nếu năng lượng đã max (24)
+      if (gameData.energy >= 24) {
+          triggerEggAnimation('shake'); // Lắc đầu từ chối
+          return;
+      }
+      
+      gameData.inventory[type]--; gameData.fruits--;
+      
+      // Tùy chỉnh mức độ nạp năng lượng tùy thuộc vào cấu hình Cheat
+      if (gameData.energyCheatMode === 'fpe') {
+          // Chế độ: Y quả tăng 1 vạch
+          gameData.fruitEatCounter++;
+          if (gameData.fruitEatCounter >= gameData.fruitsPerEnergy) {
+              gameData.energy = Math.min(24, gameData.energy + 1);
+              gameData.fruitEatCounter = 0; // Đặt lại bộ đếm
+          }
+      } else {
+          // Chế độ: 1 quả tăng X vạch
+          gameData.energy = Math.min(24, gameData.energy + (gameData.energyPerFruit || 1));
+      }
+      
+      if (typeof gameData.exp === 'undefined') gameData.exp = 0;
+      const gainedExp = Math.floor(Math.random() * 5) + 1;
+      gameData.exp += gainedExp;
+      if (gameData.exp >= 500) { gameData.happiness++; gameData.exp -= 500; await showModal("Tuyệt vời quá! 🎉", "Đã tăng thêm 1 bậc hạnh phúc rồi nè! Tiếp tục nhé 💕"); }
+      
+      // Nếu animation trước đó đang chạy, lệnh này sẽ chỉ bỏ qua nhưng điểm năng lượng vẫn được ghi nhận ở trên
+      triggerEggAnimation('happy'); 
+      saveGame();
+    }
+
+    function createPlotElement(index, plot) {
+      const plotEl = document.createElement('div');
+      plotEl.className = 'plot'; const now = Date.now(); const maxPlots = 3 + gameData.unlockedPlots;
+
+      if (index >= maxPlots) {
+        plotEl.classList.add('locked'); plotEl.innerHTML = `<div class="plot-icon">🔒</div><div class="plot-timer">Bị khóa</div>`;
+        plotEl.onclick = () => { document.getElementById('farm-modal').classList.remove('active'); showModal("Ô đất bị khóa", "Vào Cửa Hàng ở Chợ mua thêm đất để mở rộng nông trại nhé!"); };
+        return plotEl;
+      }
+      if (!plot.planted) { plotEl.innerHTML = `<div class="plot-icon">🟫</div><div class="plot-timer">Trống</div>`; plotEl.onclick = () => plantSeed(index); return plotEl; } 
+      if (now >= plot.harvestTime) { plotEl.classList.add('ready'); plotEl.innerHTML = `<div class="plot-icon">${plot.type}</div><div class="plot-timer">Hái đi!</div>`; plotEl.onclick = () => harvestCrop(index); return plotEl; } 
+      
+      plotEl.classList.add('planted');
+      const timeLeft = plot.harvestTime - now; const h = Math.floor(timeLeft / (1000 * 60 * 60)); const m = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60)); const s = Math.floor((timeLeft % (1000 * 60)) / 1000);
+      let timeText = ""; if (h > 0) timeText += `${h}h `; if (m > 0 || h > 0) timeText += `${m}p `; timeText += `${s}s`;
+      let htmlContent = `<div class="plot-icon">🌱</div><div class="plot-timer">${timeText}</div>`;
+      if (plot.isThirsty) { plotEl.classList.add('thirsty'); }
+      plotEl.innerHTML = htmlContent;
+      
+      plotEl.onclick = (e) => {
+          if(e.target.closest('.plot-action-menu')) return;
+          if (!plot.isThirsty && plot.isFertilized) return; 
+          if (activeMenuIndex === index) { activeMenuIndex = -1; } else { activeMenuIndex = index; } updateUI();
+      };
+
+      if (activeMenuIndex === index) {
+          const menu = document.createElement('div'); menu.className = 'plot-action-menu';
+          if (plot.isThirsty) {
+              const waterBtn = document.createElement('div'); waterBtn.className = 'action-icon-btn water'; waterBtn.innerHTML = `💧<span class="action-item-count">${gameData.waterCans}</span>`;
+              waterBtn.onclick = (e) => { e.stopPropagation(); activeMenuIndex = -1; waterPlot(index); }; menu.appendChild(waterBtn);
+          }
+          if (!plot.isFertilized) {
+              const fertBtn = document.createElement('div'); fertBtn.className = 'action-icon-btn fertilize'; fertBtn.innerHTML = `📦<span class="action-item-count">${gameData.fertilizers}</span>`;
+              fertBtn.onclick = (e) => { e.stopPropagation(); activeMenuIndex = -1; tryFertilize(index); }; menu.appendChild(fertBtn);
+          }
+          plotEl.appendChild(menu);
+      }
+      return plotEl;
+    }
+
+    function renderAllPlots() {
+      const modalGrid = document.getElementById('farm-grid');
+      if (modalGrid) { modalGrid.innerHTML = ""; gameData.plots.forEach((plot, index) => { modalGrid.appendChild(createPlotElement(index, plot)); }); }
+      const miniGrid = document.getElementById('mini-farm-container');
+      if (miniGrid) { miniGrid.innerHTML = ""; const startIdx = miniFarmRow * 3; for (let i = startIdx; i < startIdx + 3; i++) { if (gameData.plots[i]) miniGrid.appendChild(createPlotElement(i, gameData.plots[i])); } }
+    }
+
+    async function plantSeed(index) {
+      if (gameData.seeds <= 0) { activeMenuIndex = -1; await showModal("Trống rỗng rồi!", "Vườn của hai đứa hết hạt giống mất tiêu 🌱"); return; }
+      gameData.seeds--; const randomCrop = CROP_TYPES[Math.floor(Math.random() * CROP_TYPES.length)]; const hoursToGrow = Math.floor(Math.random() * (10 - 3 + 1)) + 3; const totalDuration = hoursToGrow * 3600000;
+      gameData.plots[index] = { planted: true, type: randomCrop, harvestTime: Date.now() + totalDuration, waterThresholds: [totalDuration / 2], isThirsty: false, isFertilized: false, lastCheckedTime: Date.now() };
+      activeMenuIndex = -1; saveGame();
+    }
+
+    async function waterPlot(index) {
+      const plot = gameData.plots[index];
+      if (!plot.isThirsty) { updateUI(); return; }
+      if (gameData.waterCans > 0) { gameData.waterCans--; gameData.plots[index].isThirsty = false; gameData.plots[index].lastCheckedTime = Date.now(); saveGame(); } 
+      else { await showModal("Cần bình tưới! 💦", "Cây đang khát sẽ bị chậm tiến độ lớn đi 50%. Hãy ghé Chợ mua thêm nhé!"); }
+    }
+
+    async function tryFertilize(index) {
+      const plot = gameData.plots[index];
+      if (plot.isFertilized) { await showModal("Đã bón phân!", "Cây này đã được bón phân rồi. Chờ cây hút dưỡng chất và lớn nhé! 🌱"); return; }
+      if (gameData.fertilizers > 0) {
+        const confirm = await showModal("Bón phân? 📦", "Dùng 1 phân bón để giảm 25-75% thời gian sinh trưởng còn lại?", "confirm");
+        if (confirm) {
+          gameData.fertilizers--; let reduction = 0.25; const r = Math.random();
+          if (r < 0.05) reduction = 0.75; else if (r < 0.20) reduction = 0.50; else if (r < 0.50) reduction = 0.35; else reduction = 0.25; 
+          const timeLeft = plot.harvestTime - Date.now(); plot.harvestTime = Date.now() + (timeLeft * (1 - reduction)); plot.waterThresholds = plot.waterThresholds.map(t => t * (1 - reduction)); plot.isFertilized = true;
+          saveGame(); await showModal("Bón phân thành công! ✨", `Thời gian thu hoạch đã rút ngắn đi ${reduction * 100}%! 🌱`);
+        }
+      } else { await showModal("Cây đang lớn", "Nhớ canh chừng và tưới nước cho cây. Yêu có thể mua Phân bón ở Chợ để ép cây lớn nhanh hơn! 🌱"); }
+    }
+
+    function harvestCrop(index) {
+      const cropType = gameData.plots[index].type; gameData.fruits++;
+      if(!gameData.inventory) gameData.inventory = {}; if(!gameData.inventory[cropType]) gameData.inventory[cropType] = 0;
+      gameData.inventory[cropType]++; gameData.plots[index] = { planted: false, type: "", harvestTime: 0, isThirsty: false, isFertilized: false, lastCheckedTime: 0, waterThresholds: [] };
+      activeMenuIndex = -1; saveGame();
+    }
+
+    document.getElementById('btn-daily-seed').addEventListener('click', () => { checkDailySeeds(); });
+    
+    document.getElementById('btn-inventory').addEventListener('click', () => {
+      const grid = document.getElementById('inventory-grid'); grid.innerHTML = ''; let hasItems = false;
+      if (gameData.inventory) { for (const [type, count] of Object.entries(gameData.inventory)) { if (count > 0) { hasItems = true; grid.innerHTML += `<div class="inv-item">${type} <span class="inv-count">x${count}</span></div>`; } } }
+      if (!hasItems) grid.innerHTML = '<div class="inv-empty">Kho đang trống trơn. Hãy trồng và hái thêm nhiều quả nhé! 🌱</div>';
+      document.getElementById('inventory-modal').classList.add('active');
+    });
+
+    function getMarketPrice() { const r = Math.random() * 100; if (r < 40) return 1; if (r < 65) return 2; if (r < 85) return 3; if (r < 95) return 4; return 5; }
+    function generateMarketItems() {
+      const items = []; const availableFruits = [...CROP_TYPES];
+      for (let i = 0; i < 5; i++) { const randIdx = Math.floor(Math.random() * availableFruits.length); const fruit = availableFruits.splice(randIdx, 1)[0]; items.push({ type: fruit, price: getMarketPrice() }); }
+      return items;
+    }
+
+    function renderMarketUI() {
+      const sellGrid = document.getElementById('market-sell-grid'); const buyGrid = document.getElementById('market-buy-grid');
+      sellGrid.innerHTML = ''; buyGrid.innerHTML = '';
+      
+      gameData.marketItems.forEach((item) => {
+        const count = (gameData.inventory && gameData.inventory[item.type]) ? gameData.inventory[item.type] : 0; const disabledStr = count > 0 ? '' : 'disabled';
+        sellGrid.innerHTML += `<div class="market-item"><div class="m-icon">${item.type}</div><div class="m-details"><div class="m-price">Giá mua: ${item.price} 💵</div><div class="m-own">Đang có: ${count}</div></div><button class="modal-btn btn-ok" style="padding: 6px 12px; flex: none;" onclick="sellItem('${item.type}', ${item.price})" ${disabledStr}>Bán</button></div>`;
+      });
+      
+      buyGrid.innerHTML += `<div class="market-item buy-item"><div class="m-icon">🌱</div><div class="m-details"><div class="m-price">Hạt giống (x5): 1 💵</div><div class="m-own">Dùng để gieo trồng</div></div><button class="modal-btn btn-ok" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); color: #1A237E; padding: 6px 12px; flex: none;" onclick="buyItem('seeds', 1)" ${gameData.coins >= 1 ? '' : 'disabled'}>Mua</button></div>`;
+      buyGrid.innerHTML += `<div class="market-item buy-item"><div class="m-icon">💦</div><div class="m-details"><div class="m-price">Bình tưới (x20): 5 💵</div><div class="m-own">Tưới cây khát nước</div></div><button class="modal-btn btn-ok" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); color: #1A237E; padding: 6px 12px; flex: none;" onclick="buyItem('waterCans', 5)" ${gameData.coins >= 5 ? '' : 'disabled'}>Mua</button></div>`;
+      buyGrid.innerHTML += `<div class="market-item buy-item"><div class="m-icon">📦</div><div class="m-details"><div class="m-price">Phân bón (x20): 5 💵</div><div class="m-own">Tăng tốc độ lớn</div></div><button class="modal-btn btn-ok" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #5D4037; padding: 6px 12px; flex: none;" onclick="buyItem('fertilizers', 5)" ${gameData.coins >= 5 ? '' : 'disabled'}>Mua</button></div>`;
+      if (gameData.unlockedPlots < 6) { 
+         const nextPlotPrice = (gameData.unlockedPlots + 1) * 100;
+         buyGrid.innerHTML += `<div class="market-item buy-item"><div class="m-icon">🟫</div><div class="m-details"><div class="m-price">Mở ô đất: ${nextPlotPrice} 💵</div><div class="m-own">Nới rộng vườn</div></div><button class="modal-btn btn-ok" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #5D4037; padding: 6px 12px; flex: none;" onclick="buyItem('plot', ${nextPlotPrice})" ${gameData.coins >= nextPlotPrice ? '' : 'disabled'}>Mở</button></div>`;
+      } else { buyGrid.innerHTML += `<div class="m-own" style="text-align:center; padding: 10px;">Yêu đã mở khóa tối đa diện tích đất! 🌟</div>`; }
+      document.getElementById('market-coin-display').innerText = gameData.coins || 0;
+    }
+
+    window.sellItem = function(type, price) {
+      if (gameData.inventory && gameData.inventory[type] > 0) { gameData.inventory[type]--; gameData.fruits--; gameData.coins += price; saveGame(); renderMarketUI(); }
+    }
+    window.buyItem = function(type, price) {
+      if (gameData.coins >= price) { gameData.coins -= price; if (type === 'seeds') gameData.seeds += 5; else if (type === 'waterCans') gameData.waterCans += 20; else if (type === 'fertilizers') gameData.fertilizers += 20; else if (type === 'plot') gameData.unlockedPlots++; saveGame(); renderMarketUI(); }
+    }
+
+    document.getElementById('btn-market').addEventListener('click', () => {
+      const today = new Date().toDateString(); if (gameData.marketDate !== today) { gameData.marketItems = generateMarketItems(); gameData.marketDate = today; saveGame(); }
+      renderMarketUI(); document.getElementById('market-modal').classList.add('active');
+    });
+
+    setInterval(() => { if(gameData.plots.some(p => p.planted)) { processTimeForPlots(); renderAllPlots(); } processEnergy(); renderEnergyUI(); }, 1000);
+    window.onload = loadGame;
+  </script>
 </body>
 </html>
