@@ -1,7 +1,7 @@
 // ============================================================
 // 1. CẤU HÌNH LIÊN KẾT TỚI GOOGLE APPS SCRIPT
 // Dán link Web App của bạn vừa copy ở Phần 1 vào giữa 2 dấu ngoặc kép:
-const API_URL = "https://script.google.com/macros/s/AKfycb.../exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzZ5nC_u4dLHDf-cArQiGPYaI3m-2PEzmZONWuFBZvxEDVMsCavrwHYu2nIaoiH6LRgCg/exec";
 // ============================================================
 
 let localLastUpdated = 0; // Biến kiểm tra phiên bản dữ liệu
