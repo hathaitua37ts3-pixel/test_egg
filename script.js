@@ -1,106 +1,106 @@
-// ==========================================
-// --- PHẦN 1: ĐẾM NGƯỢC (Giữ nguyên) ---
-// ==========================================
-// Định dạng: YYYY-MM-DDTHH:mm:ss+07:00 (Múi giờ Việt Nam)
-const targetDate = new Date('2026-08-10T00:00:00+07:00');
+// ============================================================
+// 1. CẤU HÌNH LIÊN KẾT TỚI GOOGLE APPS SCRIPT
+// Dán link Web App của bạn vừa copy ở Phần 1 vào giữa 2 dấu ngoặc kép:
+const API_URL = "https://script.google.com/macros/s/AKfycb.../exec";
+// ============================================================
 
-function updateCountdown() {
-  const now = new Date();
-  const vnTimeStr = now.toLocaleString("en-US", {timeZone: "Asia/Ho_Chi_Minh"});
-  const vnTime = new Date(vnTimeStr);
-  const targetVnTimeStr = targetDate.toLocaleString("en-US", {timeZone: "Asia/Ho_Chi_Minh"});
-  const targetVnTime = new Date(targetVnTimeStr);
-  const diffTime = targetVnTime - vnTime;
-  let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  if (days < 0) days = 0;
-  document.getElementById('countdown').innerText = `Còn ${days} ngày`;
-}
+let localLastUpdated = 0; // Biến kiểm tra phiên bản dữ liệu
 
-// Chạy ngay lần đầu và cập nhật mỗi 1 tiếng
-updateCountdown();
-setInterval(updateCountdown, 1000 * 60 * 60);
-
-
-// ==========================================
-// --- PHẦN 2: XỬ LÝ SỰ KIỆN THẤT TỊCH ---
-// ==========================================
-
-// --- CẤU HÌNH BACK-END ---
-// BẠN CẦN THAY THẾ DÒNG NÀY BẰNG LINK WEB APP NHẬN ĐƯỢC TỪ GOOGLE APPS SCRIPT
-const WEB_APP_URL = "BA_N_PHAI_DA_N_URL_GAS_VA_O_DAY"; 
-
-// Lấy các nguyên tố DOM
-const btnThattich = document.getElementById('btn-thattich');
-const wishOverlay = document.getElementById('wish-overlay');
-const closeWish = document.getElementById('close-wish');
-const btnSendWish = document.getElementById('btn-send-wish');
-const wishContent = document.getElementById('wish-content');
-
-// --- 1. Xử lý Ẩn/Hiện tờ giấy nguyện ước ---
-function toggleWishPaper(show) {
-  if (show) {
-    wishOverlay.classList.add('active');
-    wishContent.focus(); // Tự động focus vào ô nhập liệu
-  } else {
-    wishOverlay.classList.remove('active');
-    wishContent.value = ''; // Xóa nội dung cũ khi đóng
-    btnSendWish.innerText = 'Gửi Nguyện Ước'; // Reset trạng thái nút
-    btnSendWish.disabled = false;
+/**
+ * HÀM 1: Lấy dữ liệu từ máy chủ GAS về
+ * Tương đương với: google.script.run.withSuccessHandler(...).getGameDataFromSheet()
+ */
+async function loadGameData(callback) {
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    
+    if (data) {
+      localLastUpdated = data.lastUpdated || 0;
+      if (typeof callback === "function") {
+        callback(data);
+      }
+    }
+  } catch (error) {
+    console.error("Lỗi khi tải dữ liệu từ máy chủ:", error);
   }
 }
 
-// Sự kiện click nút chính
-btnThattich.addEventListener('click', () => toggleWishPaper(true));
+/**
+ * HÀM 2: Lưu dữ liệu lên máy chủ GAS
+ * Tương đương với: google.script.run.saveGameDataToSheet(clientData)
+ */
+async function saveGameData(clientData) {
+  try {
+    // Cập nhật timestamp tạm trên máy
+    localLastUpdated = Date.now();
+    clientData.lastUpdated = localLastUpdated;
 
-// Sự kiện click nút đóng (x)
-closeWish.addEventListener('click', () => toggleWishPaper(false));
+    // Gửi ngầm lên Google Apps Script
+    await fetch(API_URL, {
+      method: "POST",
+      mode: "no-cors", // Bắt buộc để trình duyệt không chặn CORS của Google
+      headers: {
+        "Content-Type": "text/plain"
+      },
+      body: JSON.stringify(clientData)
+    });
 
-// Sự kiện click ra ngoài tờ giấy để đóng
-wishOverlay.addEventListener('click', (e) => {
-  if (e.target === wishOverlay) {
-    toggleWishPaper(false);
+    console.log("Đã gửi dữ liệu lưu lên máy chủ thành công.");
+  } catch (error) {
+    console.error("Lỗi khi gửi dữ liệu lên máy chủ:", error);
   }
-});
+}
 
-// --- 2. Xử lý Gửi nguyện ước sang Back-end ---
-btnSendWish.addEventListener('click', function() {
-  const content = wishContent.value.trim();
+/**
+ * HÀM 3: TỰ ĐỘNG ĐỒNG BỘ 2 CHIỀU (Polling)
+ * Cứ mỗi 2.5 giây, tự kiểm tra xem máy của đối phương có cập nhật dữ liệu mới không
+ */
+function startRealtimeSync(onUpdateCallback) {
+  setInterval(async () => {
+    try {
+      const res = await fetch(API_URL);
+      const serverData = await res.json();
+      
+      // Nếu server có dữ liệu và dữ liệu đó MỚI HƠN phiên bản hiện tại ở máy này
+      if (serverData && serverData.lastUpdated && serverData.lastUpdated > localLastUpdated) {
+        console.log("Phát hiện dữ liệu mới từ máy bên kia, đang cập nhật...");
+        localLastUpdated = serverData.lastUpdated;
+        
+        if (typeof onUpdateCallback === "function") {
+          onUpdateCallback(serverData);
+        }
+      }
+    } catch (e) {
+      // Bỏ qua nếu mất mạng chốc lát
+    }
+  }, 2500); // 2500ms = 2.5 giây
+}
 
-  // Kiểm tra nếu chưa viết gì
-  if (!content) {
-    alert("Bạn hãy viết lời nguyện ước trước khi gửi nhé!");
-    wishContent.focus();
-    return;
-  }
+// ============================================================
+// VÍ DỤ CÁCH GẮN VÀO GAME CỦA BẠN:
+// ============================================================
 
-  // Khóa nút để tránh gửi nhiều lần
-  btnSendWish.innerText = 'Đang gửi...';
-  btnSendWish.disabled = true;
+// 1. Khi vừa mở web -> Tải dữ liệu trang trại lần đầu
+window.addEventListener("DOMContentLoaded", () => {
+  loadGameData((gameData) => {
+    console.log("Dữ liệu trang trại ban đầu:", gameData);
+    // TODO: Viết hàm render giao diện trứng, trang trại của bạn ở đây
+    // renderFarm(gameData);
+  });
 
-  // Sử dụng Fetch API để gửi dữ liệu dạng POST sang GAS
-  fetch(WEB_APP_URL, {
-    method: 'POST',
-    mode: 'no-cors', // Chế độ này cần thiết khi gọi sang GAS Web App
-    cache: 'no-cache',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    redirect: 'follow', 
-    body: JSON.stringify({
-      wish: content,
-      timestamp: new Date().toLocaleString("vi-VN")
-    })
-  })
-  .then(response => {
-    // Với mode 'no-cors', ta không đọc được response trả về, 
-    // nhưng nếu fetch không lỗi là coi như đã gửi thành công.
-    alert("Gửi nguyện ước thành công! Chúc nguyện ước của bạn thành sự thật ✨");
-    toggleWishPaper(false); // Đóng tờ giấy
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert("Có lỗi xảy ra khi gửi. Bạn hãy kiểm tra lại cấu hình Web App URL nhé!");
-    btnSendWish.innerText = 'Gửi Nguyện Ước';
-    btnSendWish.disabled = false;
+  // Bật chế độ tự động đồng bộ khi máy kia thao tác
+  startRealtimeSync((newData) => {
+    // Khi máy kia có thao tác bấm gì đó, hàm này sẽ tự chạy để vẽ lại giao diện
+    // renderFarm(newData);
   });
 });
+
+// 2. Khi bạn bấm nút (ví dụ: Ấp trứng, nhặt trứng, bán trứng):
+function onUserAction(newDataState) {
+  // 1. Cập nhật giao diện máy mình ngay lập tức
+  // renderFarm(newDataState);
+
+  // 2. Bắn dữ liệu lên máy chủ để máy bên kia nhận được
+  saveGameData(newDataState);
+}
