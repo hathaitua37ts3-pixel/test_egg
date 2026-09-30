@@ -926,79 +926,91 @@
       });
     }
 
-    function loadGame() {
+    // CẤU HÌNH LIÊN KẾT TỚI GOOGLE APPS SCRIPT
+    const API_URL = "https://script.google.com/macros/s/AKfycbzZ5nC_u4dLHDf-cArQiGPYaI3m-2PEzmZONWuFBZvxEDVMsCavrwHYu2nIaoiH6LRgCg/exec";
+
+    async function loadGame() {
       const statusText = document.getElementById('sync-status');
-      if (typeof google === 'undefined' || typeof google.script === 'undefined') {
-        isOffline = true;
-        statusText.innerText = "Chế độ trải nghiệm thử"; statusText.style.color = "#FF9800";
-        checkPlotCompat(); updateUI(); return;
+      statusText.innerText = "Đang kết nối..."; 
+      statusText.style.color = "#FF9800";
+      
+      try {
+        const res = await fetch(API_URL);
+        const serverData = await res.json();
+        
+        if (serverData && Object.keys(serverData).length > 0) {
+          gameData = serverData;
+          if(typeof gameData.exp === 'undefined') gameData.exp = 0;
+          checkPlotCompat();
+          statusText.innerText = "✓ Đang trực tuyến";
+        } else {
+          saveGame(true); 
+          statusText.innerText = "Đã tạo nhà chung mới";
+        }
+        statusText.style.color = "#4CAF50"; 
+        setTimeout(() => statusText.innerText = "", 3000); 
+        updateUI();
+      } catch (err) {
+        console.error("Lỗi tải dữ liệu:", err);
+        isOffline = true; 
+        statusText.innerText = "Mạng yếu! Đang chơi ngoại tuyến."; 
+        statusText.style.color = "#F44336"; 
+        checkPlotCompat(); 
+        updateUI();
       }
-      google.script.run
-        .withSuccessHandler(function(serverData) {
-          if (serverData) {
-            gameData = serverData;
-            if(typeof gameData.exp === 'undefined') gameData.exp = 0;
-            checkPlotCompat();
-            statusText.innerText = "✓ Đang trực tuyến";
-          } else {
-            saveGame(true); statusText.innerText = "Đã tạo nhà chung mới";
-          }
-          statusText.style.color = "#4CAF50"; setTimeout(() => statusText.innerText = "", 3000); updateUI();
-        })
-        .withFailureHandler(function(err) {
-          isOffline = true; statusText.innerText = "Mạng yếu! Đang chơi ngoại tuyến."; statusText.style.color = "#F44336"; checkPlotCompat(); updateUI();
-        })
-        .getGameDataFromSheet();
     }
 
     function saveGame(isInit = false) {
       if (!isInit) gameData.lastUpdated = Date.now();
       updateUI(); 
-      if (isOffline || typeof google === 'undefined') return;
+      if (isOffline) return;
+      
       const statusText = document.getElementById('sync-status');
-      statusText.innerText = "Đang đồng bộ..."; statusText.style.color = "#FF9800";
+      statusText.innerText = "Đang đồng bộ..."; 
+      statusText.style.color = "#FF9800";
+      
       clearTimeout(syncTimeout);
-      syncTimeout = setTimeout(() => {
-        google.script.run
-          .withSuccessHandler(function(serverData) {
-            if (serverData && serverData.lastUpdated) { gameData.lastUpdated = serverData.lastUpdated; }
-            statusText.innerText = "✓ Đã lưu"; statusText.style.color = "#4CAF50"; setTimeout(() => statusText.innerText = "", 2000);
-          })
-          .withFailureHandler(function(err) {
-            statusText.innerText = "Đồng bộ chậm (Mạng hơi yếu)"; statusText.style.color = "#F44336";
-          })
-          .saveGameDataToSheet(gameData);
+      syncTimeout = setTimeout(async () => {
+        try {
+          await fetch(API_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify(gameData)
+          });
+          statusText.innerText = "✓ Đã lưu"; 
+          statusText.style.color = "#4CAF50"; 
+          setTimeout(() => statusText.innerText = "", 2000);
+        } catch (err) {
+          console.error("Lỗi lưu dữ liệu:", err);
+          statusText.innerText = "Đồng bộ chậm (Mạng hơi yếu)"; 
+          statusText.style.color = "#F44336";
+        }
       }, 1000);
     }
 
-    function backgroundSync() {
-      if (isOffline || typeof google === 'undefined') return;
-      google.script.run
-        .withSuccessHandler(function(serverData) {
-          if (serverData && serverData.lastUpdated > gameData.lastUpdated) {
-            gameData = serverData;
-            if(typeof gameData.exp === 'undefined') gameData.exp = 0;
-            checkPlotCompat(); updateUI();
-            const statusText = document.getElementById('sync-status');
-            statusText.innerText = "↓ Yêu vừa vào chăm sóc nông trại đấy!"; statusText.style.color = "#ff6b6b";
-            triggerEggAnimation('surprised'); setTimeout(() => statusText.innerText = "", 3000);
-          }
-        }).getGameDataFromSheet();
-    }
-    setInterval(backgroundSync, 20000);
-
-    async function checkDailySeeds() {
-      const today = new Date().toDateString();
-      if (gameData.lastSeedDate !== today) {
-        const reward = Math.floor(Math.random() * 5) + 1; 
-        gameData.seeds += reward; gameData.lastSeedDate = today; saveGame();
-        await showModal("Ngày mới ngọt ngào! 🌅", `Chào ngày mới! Vườn của yêu nhận được ${reward} hạt giống. 🥰`);
-      } else {
-        await showModal("Hôm nay đã nhận hạt giống rồi!", "Hôm nay yêu đã lấy hạt giống rồi. Cùng đợi ngày mai để lấy tiếp nhé! 💕");
+    async function backgroundSync() {
+      if (isOffline) return;
+      try {
+        const res = await fetch(API_URL);
+        const serverData = await res.json();
+        
+        if (serverData && serverData.lastUpdated > gameData.lastUpdated) {
+          gameData = serverData;
+          if(typeof gameData.exp === 'undefined') gameData.exp = 0;
+          checkPlotCompat(); 
+          updateUI();
+          const statusText = document.getElementById('sync-status');
+          statusText.innerText = "↓ Yêu vừa vào chăm sóc nông trại đấy!"; 
+          statusText.style.color = "#ff6b6b";
+          triggerEggAnimation('surprised'); 
+          setTimeout(() => statusText.innerText = "", 3000);
+        }
+      } catch (err) {
+        // Bỏ qua lỗi ngầm để không làm phiền trải nghiệm
       }
     }
 
-    // --- XỬ LÝ THỜI GIAN & TỤT NĂNG LƯỢNG ---
     function processEnergy() {
       const now = Date.now();
       let msPassed = now - gameData.lastEnergyUpdate;
@@ -1310,6 +1322,7 @@
     });
 
     setInterval(() => { if(gameData.plots.some(p => p.planted)) { processTimeForPlots(); renderAllPlots(); } processEnergy(); renderEnergyUI(); }, 1000);
+    setInterval(backgroundSync, 20000);
     window.onload = loadGame;
   </script>
 </body>
